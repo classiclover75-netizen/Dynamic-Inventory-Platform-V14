@@ -235,7 +235,7 @@ const ColumnResizeHandle = ({
               onClick={() => setShowManualInput(false)}
             />
             <div
-              className="fixed z-[10001] bg-white border border-gray-300 p-2 rounded shadow-2xl flex items-center gap-1.5"
+              className="fixed z-[10001] bg-white border border-gray-300 p-3 rounded shadow-2xl flex flex-col gap-2.5 min-w-[200px]"
               style={{
                 left: `${mousePos.x}px`,
                 top: `${mousePos.y}px`,
@@ -244,29 +244,34 @@ const ColumnResizeHandle = ({
               onMouseDown={(e) => e.stopPropagation()}
               onDoubleClick={(e) => e.stopPropagation()}
             >
-              <input
-                type="number"
-                className="w-20 px-2 py-1 border rounded text-sm focus:outline-blue-500"
-                value={inputValue}
-                onChange={(e) => setInputValue(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") handleManualSave();
-                  if (e.key === "Escape") setShowManualInput(false);
-                }}
-                autoFocus
-              />
-              <button
-                onClick={handleManualSave}
-                className="bg-blue-600 text-white text-[10px] px-2 py-0.5 rounded font-bold hover:bg-blue-700"
-              >
-                Save
-              </button>
-              <button
-                onClick={() => setShowManualInput(false)}
-                className="bg-gray-400 text-white text-[10px] px-2 py-0.5 rounded font-bold hover:bg-gray-500"
-              >
-                Cancel
-              </button>
+              <div className="text-[10px] font-extrabold text-gray-400 uppercase tracking-wider border-b pb-1">
+                Column Resizing
+              </div>
+              <div className="flex items-center gap-2">
+                <input
+                  type="number"
+                  className="w-20 px-2 py-1 border rounded text-sm focus:outline-blue-500"
+                  value={inputValue}
+                  onChange={(e) => setInputValue(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") handleManualSave();
+                    if (e.key === "Escape") setShowManualInput(false);
+                  }}
+                  autoFocus
+                />
+                <button
+                  onClick={handleManualSave}
+                  className="bg-blue-600 text-white text-xs px-3 py-1 rounded font-bold hover:bg-blue-700 transition-colors"
+                >
+                  Save
+                </button>
+                <button
+                  onClick={() => setShowManualInput(false)}
+                  className="bg-red-600 text-white text-xs px-3 py-1 rounded font-bold hover:bg-red-700 transition-colors"
+                >
+                  Cancel
+                </button>
+              </div>
             </div>
           </>,
           document.body,
