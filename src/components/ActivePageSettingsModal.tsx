@@ -309,9 +309,8 @@ export const ActivePageSettingsModal = React.memo(({
         <input
           type="number"
           min="0"
-          placeholder="0"
           className="w-20 px-2 py-1 border border-gray-300 rounded text-sm font-bold text-center focus:outline-none focus:border-blue-500 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-          value={minStockAlert === 0 ? "" : minStockAlert}
+          value={minStockAlert}
           onWheel={(e) => e.currentTarget.blur()}
           onFocus={(e) => e.target.select()}
           onChange={(e) => {
