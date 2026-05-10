@@ -64,6 +64,7 @@ export const ActivePageSettingsModal = React.memo(({
   const [rowHeightInput, setRowHeightInput] = useState(String(pageConfig?.rowHeight || 100));
   const [localColumns, setLocalColumns] = useState<Column[]>(pageConfig?.columns || []);
   const [secondarySearchPage, setSecondarySearchPage] = useState<string>(pageConfig?.secondarySearchPage || '');
+  const [minStockAlert, setMinStockAlert] = useState(pageConfig?.minStockAlert ?? 0);
   const [sortSettingsColumn, setSortSettingsColumn] = useState<Column | null>(null);
   const [pendingDeleteSaleCol, setPendingDeleteSaleCol] = useState<Column | null>(null);
   const [pageStats, setPageStats] = useState<{ totalRows: number, totalColumns: number, totalImages: number, duplicateImages: number } | null>(null);
@@ -106,6 +107,7 @@ export const ActivePageSettingsModal = React.memo(({
       setRowHeightInput(String(initialHeight));
       setLocalColumns(pageConfig?.columns || []);
       setSecondarySearchPage(pageConfig?.secondarySearchPage || '');
+      setMinStockAlert(pageConfig?.minStockAlert ?? 0);
     }
   }, [isOpen, pageConfig]);
 
@@ -124,6 +126,7 @@ export const ActivePageSettingsModal = React.memo(({
         hoverPreviewEnabled: hoverPreview, 
         independentSearchBars: independentSearchBars,
         secondarySearchPage: secondarySearchPage || undefined,
+        minStockAlert: minStockAlert,
         columns: localColumns,
         ...updatedProps 
       }, closeModal);
@@ -296,6 +299,24 @@ export const ActivePageSettingsModal = React.memo(({
         <div className="mt-2 text-[11px] text-[#78909c] leading-snug">
           When enabled, typing in one search bar will not clear the text in the other search bar.
         </div>
+      </div>
+
+      <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-200 mt-2 mb-4">
+        <div>
+          <div className="text-sm font-bold text-gray-800">🚨 Low Stock Alert Threshold</div>
+          <div className="text-xs text-gray-500">Highlight remaining qty in red when stock reaches this number (Default: 0)</div>
+        </div>
+        <input
+          type="number"
+          min="0"
+          className="w-20 px-2 py-1 border border-gray-300 rounded text-sm font-bold text-center focus:outline-none focus:border-blue-500"
+          value={minStockAlert}
+          onChange={(e) => {
+            const val = parseInt(e.target.value) || 0;
+            setMinStockAlert(val);
+            saveConfig({ minStockAlert: val }, false);
+          }}
+        />
       </div>
 
       <div className="flex flex-col gap-2 p-3 bg-gray-50 rounded-lg border border-gray-200 mb-4">
