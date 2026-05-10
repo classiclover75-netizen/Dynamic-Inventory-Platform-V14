@@ -3633,9 +3633,9 @@ function AppContent() {
                                           key={col.key}
                                           {...commonProps}
                                           style={{ ...commonProps.style, overflow: isCellEditing ? "visible" : commonProps.style.overflow, zIndex: isCellEditing ? 99999 : "auto" }}
-                                          className={`p-1.5 border-r-[length:medium] border-b-[length:medium] border-[#e0e0e0] ${hoverClass} text-xs ${isCellEditing ? "relative !z-[60]" : "overflow-hidden"}`}
+                                          className={`p-1.5 border-r-[length:medium] border-b-[length:medium] border-[#e0e0e0] ${hoverClass} text-xs ${isCellEditing ? "relative !z-[60]" : ""}`}
                                         >
-                                          <div className="flex flex-col gap-1 justify-center w-full h-full min-h-[20px] p-1.5">
+                                          <div className="flex flex-col gap-1 justify-center w-full h-full min-h-[20px]">
                                             {totalSources.length > 0 ? (
                                               totalSources.map(
                                                 (ts: any, idx: number) => {
@@ -3648,7 +3648,7 @@ function AppContent() {
                                                   const originalQty = originalSaleEntry ? originalSaleEntry.qty : 0;
 
                                                   return (
-                                                    <div key={idx} className="w-full relative">
+                                                    <div key={idx} className="w-full">
                                                       <div className={`group w-full px-1.5 py-0.5 rounded text-[14px] font-bold border flex items-center justify-between gap-1 ${ts.color}`}>
                                                         <div className="flex items-center justify-between w-full">
                                                           <span className="opacity-70 shrink-0">{ts.source}:</span>
@@ -3741,11 +3741,9 @@ function AppContent() {
                                                 }
                                               )
                                             ) : (
-                                              <div className="group flex items-center justify-between gap-2">
-                                                <span className="inline-block bg-red-50 text-red-600 font-extrabold text-[14px] px-2 py-0.5 rounded border border-red-200 shadow-sm">
-                                                  0
-                                                </span>
-                                              </div>
+                                              <span className="inline-block bg-red-50 text-red-600 font-extrabold text-[14px] px-2 py-0.5 rounded border border-red-200 shadow-sm self-start">
+                                                0
+                                              </span>
                                             )}
                                           </div>
                                         </td>
