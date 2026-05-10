@@ -3741,7 +3741,7 @@ function AppContent() {
                                                 }
                                               )
                                             ) : (
-                                              <div className="bg-red-50 text-red-600 font-extrabold text-[14px] px-2 py-0.5 rounded border border-red-200 shadow-sm w-full block">
+                                              <div className="bg-red-50 text-red-600 font-extrabold text-[14px] px-2 py-0.5 rounded border border-red-200 shadow-sm w-full block text-left">
                                                 0
                                               </div>
                                             )}
