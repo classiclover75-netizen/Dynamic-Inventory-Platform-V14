@@ -3575,11 +3575,6 @@ function AppContent() {
                                                 </div>
                                               ),
                                             )}
-                                            {remainingSources.length === 0 && (
-                                              <span className="inline-block bg-[#FF0000] text-white font-extrabold text-[14px] px-2 py-0.5 rounded border border-[#cc0000] shadow-sm">
-                                                0
-                                              </span>
-                                            )}
                                           </div>
                                         </td>
                                       );
@@ -3632,114 +3627,108 @@ function AppContent() {
                                           className={`p-1.5 border-r-[length:medium] border-b-[length:medium] border-[#e0e0e0] ${hoverClass} text-xs ${isCellEditing ? "relative !z-[60]" : ""}`}
                                         >
                                           <div className="flex flex-col gap-1 justify-center w-full min-h-[20px]">
-                                            {totalSources.length > 0 ? (
-                                              totalSources.map(
-                                                (ts: any, idx: number) => {
-                                                  const isThisRowEditing = inlineEdit?.id === `${row.id}-${col.key}-${ts.source}`;
-                                                  const currentSaleEntry = (isThisRowEditing ? draftVal : currentVal).find(
-                                                    (s: any) => s.source === ts.source
-                                                  );
-                                                  const saleQty = currentSaleEntry ? currentSaleEntry.qty : 0;
-                                                  const originalSaleEntry = currentVal.find((s: any) => s.source === ts.source);
-                                                  const originalQty = originalSaleEntry ? originalSaleEntry.qty : 0;
+                                            {totalSources.map(
+                                              (ts: any, idx: number) => {
+                                                const isThisRowEditing = inlineEdit?.id === `${row.id}-${col.key}-${ts.source}`;
+                                                const currentSaleEntry = (isThisRowEditing ? draftVal : currentVal).find(
+                                                  (s: any) => s.source === ts.source
+                                                );
+                                                const saleQty = currentSaleEntry ? currentSaleEntry.qty : 0;
+                                                const originalSaleEntry = currentVal.find((s: any) => s.source === ts.source);
+                                                const originalQty = originalSaleEntry ? originalSaleEntry.qty : 0;
 
-                                                  return (
-                                                    <div key={idx} className="w-full">
-                                                      <div className={`group w-full px-1.5 py-0.5 rounded text-[14px] font-bold border flex items-center justify-between gap-1 ${ts.color}`}>
-                                                        <div className="flex items-center justify-between w-full">
-                                                          <span className="opacity-70 shrink-0">{ts.source}:</span>
-                                                          <span className="flex-1 text-right">{saleQty}</span>
-                                                        </div>
-                                                        <button
-                                                          onClick={(e) => {
-                                                            e.stopPropagation();
-                                                            setInlineEdit({
-                                                              id: `${row.id}-${col.key}-${ts.source}`,
-                                                              colKey: col.key,
-                                                              val: rawVal ? String(rawVal) : JSON.stringify([]),
-                                                              history: [],
-                                                              historyPointer: 0,
-                                                            });
-                                                          }}
-                                                          className="opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0 bg-white/60 hover:bg-white text-gray-700 rounded p-1 shadow-sm border border-black/10 w-6 h-6 flex items-center justify-center text-[10px] cursor-pointer ml-1"
-                                                          title="Edit sale"
-                                                        >
-                                                          ✏️
-                                                        </button>
+                                                return (
+                                                  <div key={idx} className="w-full">
+                                                    <div className={`group w-full px-1.5 py-0.5 rounded text-[14px] font-bold border flex items-center justify-between gap-1 ${ts.color}`}>
+                                                      <div className="flex items-center justify-between w-full">
+                                                        <span className="opacity-70 shrink-0">{ts.source}:</span>
+                                                        <span className="flex-1 text-right">{saleQty}</span>
                                                       </div>
-
-                                                      {isThisRowEditing && (
-                                                        <div 
-                                                          className="absolute z-[999999] top-0 right-0 bg-white p-3 rounded-lg shadow-[0_5px_20px_rgba(0,0,0,0.5)] border-[3px] flex flex-col gap-4 min-w-[240px]"
-                                                          style={{ borderColor: ts.color?.includes('blue') ? '#3b82f6' : ts.color?.includes('green') ? '#22c55e' : ts.color?.includes('yellow') ? '#eab308' : ts.color?.includes('red') ? '#ef4444' : ts.color?.includes('purple') ? '#a855f7' : '#94a3b8' }}
-                                                          onClick={(e) => e.stopPropagation()}
-                                                        >
-                                                          <div className="font-bold text-gray-700 text-[14px]">Edit Sale for {ts.source}</div>
-                                                          <div className="text-[11px] text-gray-500 mb-2 -mt-0.5">Previous Value: <span className="font-bold text-gray-800">{originalQty}</span></div>
-                                                          <div className="flex items-center justify-between gap-2 border-b pb-3">
-                                                            <span className={`px-2 py-1 rounded text-[15px] font-bold border ${ts.color}`}>{ts.source}</span>
-                                                            <input
-                                                              type="number"
-                                                              value={saleQty === 0 ? "" : saleQty}
-                                                              onChange={(e) => {
-                                                                const copy = [...draftVal];
-                                                                const existingIdx = copy.findIndex((s: any) => s.source === ts.source);
-                                                                let newQty = parseFloat(e.target.value);
-                                                                if (isNaN(newQty)) newQty = 0;
-                                                                if (existingIdx >= 0) {
-                                                                  copy[existingIdx].qty = newQty;
-                                                                } else {
-                                                                  copy.push({ source: ts.source, qty: newQty, color: ts.color });
-                                                                }
-                                                                setInlineEdit((prev) => ({ ...prev!, val: JSON.stringify(copy) }));
-                                                              }}
-                                                              onWheel={(e) => e.currentTarget.blur()}
-                                                              onFocus={(e) => {
-                                                                setTimeout(() => e.target.select(), 0);
-                                                              }}
-                                                              onKeyDown={(e) => {
-                                                                if (e.key === "Enter") {
-                                                                  e.preventDefault();
-                                                                  handleSaveInlineEdit(activePage!, row.id, col.key, inlineEdit!.val);
-                                                                } else if (e.key === "Escape") {
-                                                                  e.preventDefault();
-                                                                  setInlineEdit(null);
-                                                                }
-                                                              }}
-                                                              autoFocus
-                                                              className="w-24 bg-gray-50 border border-gray-300 px-2 py-1 text-right font-bold text-[16px] rounded text-blue-800 outline-none focus:border-blue-600 focus:bg-white focus:ring-2 focus:ring-blue-100 transition-all [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                                                            />
-                                                          </div>
-                                                          <div className="flex items-center justify-end gap-3 pt-1">
-                                                            <button
-                                                              onClick={(e) => {
-                                                                e.stopPropagation();
-                                                                setInlineEdit(null);
-                                                              }}
-                                                              className="bg-red-600 hover:bg-red-700 active:bg-red-800 text-white rounded px-4 py-1.5 text-sm font-bold shadow-md transition-colors"
-                                                            >
-                                                              Cancel
-                                                            </button>
-                                                            <button
-                                                              onClick={(e) => {
-                                                                e.stopPropagation();
-                                                                handleSaveInlineEdit(activePage!, row.id, col.key, inlineEdit!.val);
-                                                              }}
-                                                              className="bg-green-600 hover:bg-green-700 active:bg-green-800 text-white rounded px-5 py-1.5 text-sm font-bold shadow-md transition-colors"
-                                                            >
-                                                              Save
-                                                            </button>
-                                                          </div>
-                                                        </div>
-                                                      )}
+                                                      <button
+                                                        onClick={(e) => {
+                                                          e.stopPropagation();
+                                                          setInlineEdit({
+                                                            id: `${row.id}-${col.key}-${ts.source}`,
+                                                            colKey: col.key,
+                                                            val: rawVal ? String(rawVal) : JSON.stringify([]),
+                                                            history: [],
+                                                            historyPointer: 0,
+                                                          });
+                                                        }}
+                                                        className="opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0 bg-white/60 hover:bg-white text-gray-700 rounded p-1 shadow-sm border border-black/10 w-6 h-6 flex items-center justify-center text-[10px] cursor-pointer ml-1"
+                                                        title="Edit sale"
+                                                      >
+                                                        ✏️
+                                                      </button>
                                                     </div>
-                                                  );
-                                                }
-                                              )
-                                            ) : (
-                                              <div className="bg-red-50 text-red-600 font-extrabold text-[14px] px-2 py-0.5 rounded border border-red-200 shadow-sm w-full block text-left">
-                                                0
-                                              </div>
+
+                                                    {isThisRowEditing && (
+                                                      <div 
+                                                        className="absolute z-[999999] top-0 right-0 bg-white p-3 rounded-lg shadow-[0_5px_20px_rgba(0,0,0,0.5)] border-[3px] flex flex-col gap-4 min-w-[240px]"
+                                                        style={{ borderColor: ts.color?.includes('blue') ? '#3b82f6' : ts.color?.includes('green') ? '#22c55e' : ts.color?.includes('yellow') ? '#eab308' : ts.color?.includes('red') ? '#ef4444' : ts.color?.includes('purple') ? '#a855f7' : '#94a3b8' }}
+                                                        onClick={(e) => e.stopPropagation()}
+                                                      >
+                                                        <div className="font-bold text-gray-700 text-[14px]">Edit Sale for {ts.source}</div>
+                                                        <div className="text-[11px] text-gray-500 mb-2 -mt-0.5">Previous Value: <span className="font-bold text-gray-800">{originalQty}</span></div>
+                                                        <div className="flex items-center justify-between gap-2 border-b pb-3">
+                                                          <span className={`px-2 py-1 rounded text-[15px] font-bold border ${ts.color}`}>{ts.source}</span>
+                                                          <input
+                                                            type="number"
+                                                            value={saleQty === 0 ? "" : saleQty}
+                                                            onChange={(e) => {
+                                                              const copy = [...draftVal];
+                                                              const existingIdx = copy.findIndex((s: any) => s.source === ts.source);
+                                                              let newQty = parseFloat(e.target.value);
+                                                              if (isNaN(newQty)) newQty = 0;
+                                                              if (existingIdx >= 0) {
+                                                                copy[existingIdx].qty = newQty;
+                                                              } else {
+                                                                copy.push({ source: ts.source, qty: newQty, color: ts.color });
+                                                              }
+                                                              setInlineEdit((prev) => ({ ...prev!, val: JSON.stringify(copy) }));
+                                                            }}
+                                                            onWheel={(e) => e.currentTarget.blur()}
+                                                            onFocus={(e) => {
+                                                              setTimeout(() => e.target.select(), 0);
+                                                            }}
+                                                            onKeyDown={(e) => {
+                                                              if (e.key === "Enter") {
+                                                                e.preventDefault();
+                                                                handleSaveInlineEdit(activePage!, row.id, col.key, inlineEdit!.val);
+                                                              } else if (e.key === "Escape") {
+                                                                e.preventDefault();
+                                                                setInlineEdit(null);
+                                                              }
+                                                            }}
+                                                            autoFocus
+                                                            className="w-24 bg-gray-50 border border-gray-300 px-2 py-1 text-right font-bold text-[16px] rounded text-blue-800 outline-none focus:border-blue-600 focus:bg-white focus:ring-2 focus:ring-blue-100 transition-all [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                                                          />
+                                                        </div>
+                                                        <div className="flex items-center justify-end gap-3 pt-1">
+                                                          <button
+                                                            onClick={(e) => {
+                                                              e.stopPropagation();
+                                                              setInlineEdit(null);
+                                                            }}
+                                                            className="bg-red-600 hover:bg-red-700 active:bg-red-800 text-white rounded px-4 py-1.5 text-sm font-bold shadow-md transition-colors"
+                                                          >
+                                                            Cancel
+                                                          </button>
+                                                          <button
+                                                            onClick={(e) => {
+                                                              e.stopPropagation();
+                                                              handleSaveInlineEdit(activePage!, row.id, col.key, inlineEdit!.val);
+                                                            }}
+                                                            className="bg-green-600 hover:bg-green-700 active:bg-green-800 text-white rounded px-5 py-1.5 text-sm font-bold shadow-md transition-colors"
+                                                          >
+                                                            Save
+                                                          </button>
+                                                        </div>
+                                                      </div>
+                                                    )}
+                                                  </div>
+                                                );
+                                              }
                                             )}
                                           </div>
                                         </td>
