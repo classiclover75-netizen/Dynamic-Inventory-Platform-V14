@@ -844,7 +844,9 @@ function AppContent() {
     startName: string;
     endName: string;
     keys: string[];
+    selectedSources: string[];
   } | null>(null);
+  const [sumSelectedSources, setSumSelectedSources] = useState<string[]>([]);
   const [isArchiveModalOpen, setIsArchiveModalOpen] = useState(false);
   const [isArchiveDeleteModalOpen, setIsArchiveDeleteModalOpen] =
     useState(false);
@@ -2267,14 +2269,68 @@ function AppContent() {
     return cols;
   }, [activeConfig.columns, activeCustomSum]);
 
+  const uniqueSourcesInRange = useMemo(() => {
+    if (!isSumModalOpen || !activeConfig.isTrackerPage) return [];
+    const startIdx = activeConfig.columns.findIndex(
+      (c) => c.key === sumStartCol,
+    );
+    const endIdx = activeConfig.columns.findIndex((c) => c.key === sumEndCol);
+    if (startIdx === -1 || endIdx === -1) return [];
+
+    const minIdx = Math.min(startIdx, endIdx);
+    const maxIdx = Math.max(startIdx, endIdx);
+    const keys = activeConfig.columns
+      .slice(minIdx, maxIdx + 1)
+      .map((c) => c.key);
+
+    const allSources = new Set<string>();
+    activeRows.forEach((row) => {
+      keys.forEach((k) => {
+        const parsed = parseMultiSource(row[k]);
+        parsed.forEach((s: any) => {
+          if (s.source) allSources.add(s.source);
+        });
+      });
+    });
+    return Array.from(allSources).sort((a, b) => a.localeCompare(b));
+  }, [isSumModalOpen, sumStartCol, sumEndCol, activeConfig.columns, activeRows]);
+
   const activeRowsWithSum = useMemo(() => {
     if (!activeCustomSum || !activeConfig.isTrackerPage) return activeRows;
+    const selected = activeCustomSum.selectedSources || [];
     return activeRows.map((r) => {
-      const sum = activeCustomSum.keys.reduce(
-        (acc, k) => acc + (parseFloat(String(r[k] || 0)) || 0),
-        0,
-      );
-      return { ...r, custom_temp_sum: String(sum) };
+      let totalQty = 0;
+      const breakdownMap: Record<string, number> = {};
+
+      activeCustomSum.keys.forEach((k) => {
+        const sources = parseMultiSource(r[k]);
+        sources.forEach((s: any) => {
+          if (selected.length === 0 || selected.includes(s.source)) {
+            totalQty += parseFloat(String(s.qty)) || 0;
+            breakdownMap[s.source] = (breakdownMap[s.source] || 0) + (parseFloat(String(s.qty)) || 0);
+          }
+        });
+      });
+
+      const breakdown = Object.entries(breakdownMap).map(([source, qty]) => {
+        let color = "bg-gray-100 text-gray-800 border-gray-200";
+        // Attempt to find original color
+        activeCustomSum.keys.some(k => {
+          const srcObj = parseMultiSource(r[k]).find((so: any) => so.source === source);
+          if (srcObj && srcObj.color) {
+            color = srcObj.color;
+            return true;
+          }
+          return false;
+        });
+        return { source, qty, color };
+      }).sort((a, b) => a.source.localeCompare(b.source));
+
+      return {
+        ...r,
+        custom_temp_sum: String(totalQty),
+        custom_temp_sum_breakdown: JSON.stringify(breakdown),
+      };
     });
   }, [activeRows, activeCustomSum, activeConfig.isTrackerPage]);
 
@@ -3512,13 +3568,25 @@ function AppContent() {
 
                                   if (config.isTrackerPage) {
                                     if (col.key === "custom_temp_sum") {
+                                      const breakdown = parseMultiSource(row.custom_temp_sum_breakdown);
                                       return (
                                         <td
                                           key={col.key}
                                           {...commonProps}
                                           className={`p-1.5 border-r-[length:medium] border-b-[length:medium] border-[#e0e0e0] overflow-hidden whitespace-pre-wrap bg-purple-50 text-purple-900 font-bold text-center`}
                                         >
-                                          {rawVal}
+                                          <div className="flex flex-col gap-1 justify-center w-full min-h-[20px]">
+                                            {breakdown.map((b: any, idx: number) => (
+                                              <div key={idx} className={`w-full px-1.5 py-0.5 rounded text-[14px] font-bold border flex items-center justify-between gap-1 shadow-sm ${b.color}`}>
+                                                <span className="opacity-70 shrink-0 capitalize">{b.source}:</span>
+                                                <span className="flex-1 text-right">{b.qty}</span>
+                                              </div>
+                                            ))}
+                                            <div className="mt-1 pt-1 border-t border-purple-200 text-purple-900 font-extrabold text-[15px] flex items-center justify-between w-full">
+                                              <span className="opacity-50 text-[11px] uppercase tracking-wider">Total</span>
+                                              <span>{rawVal}</span>
+                                            </div>
+                                          </div>
                                         </td>
                                       );
                                     }
@@ -3916,6 +3984,7 @@ function AppContent() {
                 }
                 setSumStartSearchQuery("");
                 setSumEndSearchQuery("");
+                setSumSelectedSources([]);
                 setIsSumModalOpen(true);
               }}
               className="bg-purple-100 text-purple-800 border border-purple-300 px-3 py-1.5 rounded text-xs font-bold shadow-sm hover:bg-purple-200 flex items-center gap-1"
@@ -5095,6 +5164,63 @@ function AppContent() {
               </div>
             </div>
 
+            {/* Step 3: Filter by Source */}
+            <div className="mb-6 p-4 bg-purple-50/50 rounded-lg border border-purple-100">
+              <div className="flex items-center justify-between mb-3">
+                <label className="text-xs font-bold text-purple-700 uppercase tracking-wider">
+                  Step 3: Filter by Source (Optional)
+                </label>
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => setSumSelectedSources(uniqueSourcesInRange)}
+                    className="text-[10px] font-extrabold text-purple-600 hover:text-purple-800 uppercase tracking-tight"
+                  >
+                    Select All
+                  </button>
+                  <button
+                    onClick={() => setSumSelectedSources([])}
+                    className="text-[10px] font-extrabold text-red-600 hover:text-red-800 uppercase tracking-tight"
+                  >
+                    Clear
+                  </button>
+                </div>
+              </div>
+              <div className="flex flex-wrap gap-2 p-3 bg-white rounded-md border border-purple-100 min-h-[50px]">
+                {uniqueSourcesInRange.length > 0 ? (
+                  uniqueSourcesInRange.map((source) => {
+                    const isSelected = sumSelectedSources.includes(source);
+                    return (
+                      <button
+                        key={source}
+                        onClick={() => {
+                          setSumSelectedSources((prev) =>
+                            prev.includes(source)
+                              ? prev.filter((s) => s !== source)
+                              : [...prev, source],
+                          );
+                        }}
+                        className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all border flex items-center gap-1.5 ${
+                          isSelected
+                            ? "bg-purple-600 text-white border-purple-700 shadow-md transform scale-105"
+                            : "bg-white text-gray-600 border-gray-200 hover:border-purple-300 hover:bg-purple-50"
+                        }`}
+                      >
+                        <span className={`w-2 h-2 rounded-full ${isSelected ? "bg-white" : "bg-purple-300"}`} />
+                        {source}
+                      </button>
+                    );
+                  })
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center text-[11px] text-gray-400 italic font-medium">
+                    Select a range above to populate source filters
+                  </div>
+                )}
+              </div>
+              <p className="text-[10px] text-gray-400 mt-2 italic">
+                * If no sources are selected, the entire range total will be calculated.
+              </p>
+            </div>
+
             <div className="flex justify-end gap-2">
               <button
                 onClick={() => setIsSumModalOpen(false)}
@@ -5126,6 +5252,7 @@ function AppContent() {
                     startName: saleCols[startIdx].name,
                     endName: saleCols[endIdx].name,
                     keys: keysToSum,
+                    selectedSources: sumSelectedSources,
                   });
 
                   setIsSumModalOpen(false);
