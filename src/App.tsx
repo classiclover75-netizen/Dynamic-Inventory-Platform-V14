@@ -1690,63 +1690,54 @@ function AppContent() {
     }
   };
 
-  const handleSaveColumnWidth = useCallback(
-    async (colId: string, newWidth: number, targetPageOverride?: string) => {
-      const pageToUpdate = targetPageOverride || state.activePage;
-      if (!pageToUpdate) return;
+  const handleSaveColumnWidth = useCallback(async (colId: string, newWidth: number, targetPageOverride?: string) => {
+    const pageToUpdate = targetPageOverride || state.activePage;
+    if (!pageToUpdate) return;
 
-      setState((prev) => {
-        const pageConfig = prev.pageConfigs[pageToUpdate];
-        if (!pageConfig) return prev;
+    setState(prev => {
+      const pageConfig = prev.pageConfigs[pageToUpdate];
+      if (!pageConfig) return prev;
 
-        const colIndex = pageConfig.columns.findIndex((c) => c.key === colId);
-        if (colIndex === -1) return prev;
+      const colIndex = pageConfig.columns.findIndex(c => c.key === colId);
+      if (colIndex === -1) return prev;
 
-        const updatedColumns = [...pageConfig.columns];
-        updatedColumns[colIndex] = {
-          ...updatedColumns[colIndex],
-          width: newWidth,
-        };
+      const updatedColumns = [...pageConfig.columns];
+      updatedColumns[colIndex] = { ...updatedColumns[colIndex], width: newWidth };
 
-        return {
-          ...prev,
-          pageConfigs: {
-            ...prev.pageConfigs,
-            [pageToUpdate]: {
-              ...pageConfig,
-              columns: updatedColumns,
-            },
-          },
-        };
+      return {
+        ...prev,
+        pageConfigs: {
+          ...prev.pageConfigs,
+          [pageToUpdate]: {
+            ...pageConfig,
+            columns: updatedColumns
+          }
+        }
+      };
+    });
+
+    try {
+      const currentConfig = state.pageConfigs[pageToUpdate];
+      if (!currentConfig) return;
+      
+      const colIndex = currentConfig.columns.findIndex(c => c.key === colId);
+      if(colIndex === -1) return;
+      
+      const updatedColumns = [...currentConfig.columns];
+      updatedColumns[colIndex] = { ...updatedColumns[colIndex], width: newWidth };
+
+      await fetch('/api/pages/update-config', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: pageToUpdate,
+          config: { ...currentConfig, columns: updatedColumns }
+        })
       });
-
-      try {
-        const currentConfig = state.pageConfigs[pageToUpdate];
-        if (!currentConfig) return;
-
-        const colIndex = currentConfig.columns.findIndex((c) => c.key === colId);
-        if (colIndex === -1) return;
-
-        const updatedColumns = [...currentConfig.columns];
-        updatedColumns[colIndex] = {
-          ...updatedColumns[colIndex],
-          width: newWidth,
-        };
-
-        await fetch("/api/pages/update-config", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            pageName: pageToUpdate,
-            config: { ...currentConfig, columns: updatedColumns },
-          }),
-        });
-      } catch (err) {
-        console.error("Error saving column width:", err);
-      }
-    },
-    [state.activePage, state.pageConfigs, setState],
-  );
+    } catch (err) {
+      console.error("Error saving column width:", err);
+    }
+  }, [state.activePage, state.pageConfigs, setState]);
 
   const handleCreateColumns = async (newColumns: Column[]) => {
     // Set default width of 150 for all new columns
@@ -3081,15 +3072,15 @@ function AppContent() {
                         )}
                       </div>
 
-                      <ColumnResizeHandle
-                        header={header}
+                      <ColumnResizeHandle 
+                        header={header} 
                         onManualSave={(id, w) => {
                           let targetPage = state.activePage;
                           if (isSecondary && activeConfig?.secondarySearchPage) {
                             targetPage = activeConfig.secondarySearchPage;
                           }
                           handleSaveColumnWidth(id, w, targetPage);
-                        }}
+                        }} 
                       />
                     </th>
                   );

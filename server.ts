@@ -813,12 +813,13 @@ app.delete('/api/pages/:name', async (req, res) => {
 
 app.post('/api/pages/update-config', async (req, res) => {
   try {
-    const { pageName, config } = req.body;
+    const { pageName, name, config } = req.body;
+    const finalPageName = name || pageName;
     if (isUsingMongoDB) {
-      await Page.findOneAndUpdate({ name: pageName }, { config });
+      await Page.findOneAndUpdate({ name: finalPageName }, { config });
     } else {
       const db = await getLocalDB();
-      const page = db.pages.find((p: any) => p.name === pageName);
+      const page = db.pages.find((p: any) => p.name === finalPageName);
       if (page) page.config = config;
       await saveLocalDB(db);
     }
