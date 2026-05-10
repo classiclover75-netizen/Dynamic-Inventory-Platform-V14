@@ -2767,24 +2767,38 @@ function AppContent() {
   const secSizingInfo = secTable.getState().columnSizingInfo;
   const secSizing = secTable.getState().columnSizing;
 
+  const prevPrimResizing = useRef<string | boolean | undefined>(false);
   useEffect(() => {
-    if (!primSizingInfo || primSizingInfo.isResizingColumn) return;
-    Object.entries(primSizing).forEach(([colKey, finalWidth]) => {
-      handleSaveColumnWidth(colKey, finalWidth as number, state.activePage);
-    });
-  }, [primSizingInfo.isResizingColumn, primSizing, state.activePage]);
+    const wasResizing = prevPrimResizing.current;
+    const isResizing = primSizingInfo?.isResizingColumn;
+    prevPrimResizing.current = isResizing;
 
+    if (wasResizing && !isResizing && typeof wasResizing === "string") {
+      const finalWidth = primSizing[wasResizing];
+      if (finalWidth) {
+        handleSaveColumnWidth(wasResizing, finalWidth as number, state.activePage);
+      }
+    }
+  }, [primSizingInfo?.isResizingColumn, primSizing, state.activePage, handleSaveColumnWidth]);
+
+  const prevSecResizing = useRef<string | boolean | undefined>(false);
   useEffect(() => {
-    const secPage = activeConfig.secondarySearchPage;
-    if (!secPage) return;
-    if (!secSizingInfo || secSizingInfo.isResizingColumn) return;
-    Object.entries(secSizing).forEach(([colKey, finalWidth]) => {
-      handleSaveColumnWidth(colKey, finalWidth as number, secPage);
-    });
+    const wasResizing = prevSecResizing.current;
+    const isResizing = secSizingInfo?.isResizingColumn;
+    prevSecResizing.current = isResizing;
+
+    if (wasResizing && !isResizing && typeof wasResizing === "string") {
+      const finalWidth = secSizing[wasResizing];
+      const secPage = activeConfig.secondarySearchPage;
+      if (finalWidth && secPage) {
+        handleSaveColumnWidth(wasResizing, finalWidth as number, secPage);
+      }
+    }
   }, [
-    secSizingInfo.isResizingColumn,
+    secSizingInfo?.isResizingColumn,
     secSizing,
     activeConfig.secondarySearchPage,
+    handleSaveColumnWidth
   ]);
 
   const primParentRef = useRef<HTMLDivElement>(null);
