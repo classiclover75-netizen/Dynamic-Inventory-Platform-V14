@@ -346,12 +346,18 @@ function AppContent() {
       .then((res) => res.json())
       .then((data) => {
         if (data && !data.error) {
+          const urlParams = new URLSearchParams(window.location.search);
+          const urlPage = urlParams.get("page");
+          const isValidPage =
+            urlPage && data.pages && data.pages.includes(urlPage);
+
           setState((prev) => ({
             ...prev,
             pages: data.pages || [],
             globalRowNoWidth: data.globalRowNoWidth || prev.globalRowNoWidth,
-            activePage:
-              data.pages && data.pages.length > 0 && !prev.activePage
+            activePage: isValidPage
+              ? urlPage
+              : data.pages && data.pages.length > 0 && !prev.activePage
                 ? data.pages[0]
                 : prev.activePage,
           }));
@@ -361,6 +367,16 @@ function AppContent() {
       .catch((err) => console.error("Failed to fetch initial state:", err))
       .finally(() => setIsLoading(false));
   }, []);
+
+  useEffect(() => {
+    if (state.activePage) {
+      window.history.replaceState(
+        null,
+        "",
+        "?page=" + encodeURIComponent(state.activePage),
+      );
+    }
+  }, [state.activePage]);
 
   useEffect(() => {
     if (!state.activePage) return;
