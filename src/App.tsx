@@ -2753,6 +2753,14 @@ function AppContent() {
     getCoreRowModel: getCoreRowModel(),
   });
 
+  useEffect(() => {
+    primTable.resetColumnSizing();
+  }, [state.activePage, primTable]);
+
+  useEffect(() => {
+    secTable.resetColumnSizing();
+  }, [activeConfig.secondarySearchPage, secTable]);
+
   const primSizingInfo = primTable.getState().columnSizingInfo;
   const primSizing = primTable.getState().columnSizing;
 
