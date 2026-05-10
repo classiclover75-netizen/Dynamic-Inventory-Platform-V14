@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Button, Input, Modal } from './ui';
+import { Button, Input } from './ui';
 import { Column, RowData } from '../types';
 import { useToast } from './ToastProvider';
 import { Edit, RefreshCw, X, ArrowLeft, ZoomIn, ZoomOut, RotateCcw, Trash2 } from 'lucide-react';
@@ -65,7 +65,6 @@ export const ImagePreviewModal = React.memo(({
   if (!isOpen || !row) return null;
 
   const rawImgVal = row[imageColKey];
-  const imgVal = typeof rawImgVal === 'object' && rawImgVal !== null ? rawImgVal.data : rawImgVal;
   const metadata = typeof rawImgVal === 'object' && rawImgVal !== null ? rawImgVal : null;
 
   const formatSize = (bytes: number) => {

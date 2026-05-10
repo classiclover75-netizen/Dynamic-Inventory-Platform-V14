@@ -176,8 +176,6 @@ const RANDOM_COLORS = [
   "bg-purple-100 text-purple-800 border-purple-200",
   "bg-pink-100 text-pink-800 border-pink-200",
 ];
-const getRandomColor = () =>
-  RANDOM_COLORS[Math.floor(Math.random() * RANDOM_COLORS.length)];
 
 export const AddRowModal = React.memo(
   ({

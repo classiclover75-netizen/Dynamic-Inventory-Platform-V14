@@ -4,7 +4,7 @@ import { AppState, GlobalCopyBoxesSettings } from '../types';
 import { DragDropContext, Droppable, Draggable, DropResult } from '@hello-pangea/dnd';
 import { GripVertical } from 'lucide-react';
 
-interface GlobalCopyBoxesSettingsModalProps {
+export interface GlobalCopyBoxesSettingsModalProps {
   isOpen: boolean;
   onClose: () => void;
   state: AppState;

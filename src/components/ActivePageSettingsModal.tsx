@@ -1,7 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { Button, Input, Modal } from './ui';
 import { Column, PageConfig } from '../types';
-import { useToast } from './ToastProvider';
 import { Edit, Trash2, Plus, GripVertical, RefreshCw, ArrowUpDown, Lock, Sliders } from 'lucide-react';
 import { ColumnSortSettingsModal } from './ColumnSortSettingsModal';
 import { DragDropContext, Droppable, Draggable, DropResult } from '@hello-pangea/dnd';

@@ -3,18 +3,6 @@ import ExcelJS from 'exceljs';
 import { Modal, Button, Input } from './ui';
 import { Column, RowData } from '../types';
 import { Download, Search, FileUp, ArrowLeft } from 'lucide-react';
-import { useToast } from './ToastProvider';
-
-const bufferToBase64 = (buffer: ArrayBuffer) => {
-  const bytes = new Uint8Array(buffer);
-  let binary = '';
-  const len = bytes.byteLength;
-  const chunk = 8192;
-  for (let i = 0; i < len; i += chunk) {
-    binary += String.fromCharCode.apply(null, bytes.subarray(i, i + chunk) as unknown as number[]);
-  }
-  return window.btoa(binary);
-};
 
 interface ExcelImportModalProps {
   isOpen: boolean;
@@ -40,7 +28,7 @@ export const ExcelImportModal = React.memo(({ isOpen, onClose, onBack, onImport,
   const [trimmedCellsCount, setTrimmedCellsCount] = useState(0);
   const [importSummary, setImportSummary] = useState<{ imported: number; duplicates: number; trimmed: number } | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const { toast } = useToast();
+  // Removed toast
 
   const compressImage = (base64Str: string, maxWidth = 1200, quality = 0.7): Promise<string> => {
     return new Promise((resolve) => {

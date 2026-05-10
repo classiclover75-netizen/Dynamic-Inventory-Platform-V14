@@ -3,7 +3,7 @@ import { CopyBoxConfig } from '../types';
 import { Button, Input, Modal, SelectableDropdown } from './ui';
 import { Trash2, Plus, ArrowUp, ArrowDown } from 'lucide-react';
 
-interface CopySettingsModalProps {
+export interface CopySettingsModalProps {
   isOpen: boolean;
   onClose: () => void;
   copyBoxes: CopyBoxConfig[];

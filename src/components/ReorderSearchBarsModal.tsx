@@ -3,7 +3,7 @@ import { Button, Modal } from './ui';
 import { GripVertical, ArrowLeft } from 'lucide-react';
 import { DragDropContext, Droppable, Draggable, DropResult } from '@hello-pangea/dnd';
 
-interface ReorderSearchBarsModalProps {
+export interface ReorderSearchBarsModalProps {
   isOpen: boolean;
   onClose: () => void;
   onBack: () => void;

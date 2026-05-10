@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Modal, Button, Input } from './ui';
 import { AppState } from '../types';
 
-interface RowNoResizeModalProps {
+export interface RowNoResizeModalProps {
   isOpen: boolean;
   onClose: () => void;
   state: AppState;

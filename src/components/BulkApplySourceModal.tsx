@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect, useDeferredValue } from "react";
-import { Search, ArrowLeft, LayoutList } from "lucide-react";
-import { Modal, Button, Input } from "./ui";
+import { Search, ArrowLeft } from "lucide-react";
+import { Modal, Button } from "./ui";
 
 interface RowData {
   id: string;
@@ -188,8 +188,6 @@ export const BulkApplySourceModal: React.FC<BulkApplySourceModalProps> = ({
 
   if (!context) return null;
 
-  const targetCol = columns.find(c => c.key === context.colKey);
-
   return (
     <Modal
       isOpen={isOpen}
@@ -266,7 +264,7 @@ export const BulkApplySourceModal: React.FC<BulkApplySourceModalProps> = ({
               </tr>
             </thead>
             <tbody>
-              {filteredRows.map((row, idx) => {
+              {filteredRows.map((row) => {
                 const isSelected = selectedRowIds.has(String(row.id));
                 const currentSources = parseMultiSource(row[context.colKey]);
                 

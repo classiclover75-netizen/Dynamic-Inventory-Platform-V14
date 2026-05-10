@@ -6,7 +6,7 @@ import { saveAs } from 'file-saver';
 import { useToast } from './ToastProvider';
 import { Search, ArrowLeft, FileSpreadsheet } from 'lucide-react';
 
-interface ExcelExportModalProps {
+export interface ExcelExportModalProps {
   isOpen: boolean;
   onClose: () => void;
   onBack: () => void;

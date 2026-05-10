@@ -3,7 +3,7 @@ import { Button, Modal } from './ui';
 import { GripVertical } from 'lucide-react';
 import { DragDropContext, Droppable, Draggable, DropResult } from '@hello-pangea/dnd';
 
-interface ReorderPagesModalProps {
+export interface ReorderPagesModalProps {
   isOpen: boolean;
   onClose: () => void;
   pages: string[];

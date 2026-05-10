@@ -10,8 +10,7 @@ export const EditColumnModal = React.memo(({
   onSave,
   onUpdate,
   column,
-  existingColumns,
-  setConfirmationModal
+  existingColumns
 }: {
   isOpen: boolean;
   onClose: () => void;
@@ -20,7 +19,6 @@ export const EditColumnModal = React.memo(({
   onUpdate?: (updatedColumn: Column) => void;
   column: Column | null;
   existingColumns: Column[];
-  setConfirmationModal: (modal: { isOpen: boolean, title?: string, message?: string, confirmLabel?: string, onConfirm: () => void } | null) => void;
 }) => {
   const [name, setName] = useState('');
   const [type, setType] = useState<ColumnType>('text');

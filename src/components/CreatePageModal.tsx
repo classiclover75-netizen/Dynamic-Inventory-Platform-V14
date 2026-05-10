@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Button, Input, Select, Modal } from './ui';
-import { ColumnType, Column, PageConfig } from '../types';
+import { ColumnType, Column } from '../types';
 import { useToast } from './ToastProvider';
 import { Trash2, Plus, Wand2 } from 'lucide-react';
 

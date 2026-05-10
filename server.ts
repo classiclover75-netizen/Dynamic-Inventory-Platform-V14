@@ -16,7 +16,6 @@ const upload = multer({ dest: 'temp_uploads/' });
 
 const app = express();
 const PORT = Number(process.env.PORT) || 3000;
-const MONGODB_URI = process.env.MONGODB_URI;
 
 const UPLOADS_DIR = path.join(process.cwd(), 'uploads');
 if (!fs.existsSync(UPLOADS_DIR)) {
@@ -378,7 +377,7 @@ const getFormattedDate = () => {
   return `${day}-${month}-${year}`;
 };
 
-app.post('/api/admin/migrate-images', async (req, res) => {
+app.post('/api/admin/migrate-images', async (_req, res) => {
   try {
     let migratedCount = 0;
     const brokenImages: any[] = [];
@@ -530,7 +529,7 @@ app.get('/api/export/page/:name', async (req, res) => {
   }
 });
 
-app.get('/api/export', async (req, res) => {
+app.get('/api/export', async (_req, res) => {
   try {
     let state: any = {};
     if (isUsingMongoDB) {
@@ -590,7 +589,7 @@ app.get('/api/export', async (req, res) => {
   }
 });
 
-app.get('/api/export-zip', async (req, res) => {
+app.get('/api/export-zip', async (_req, res) => {
   try {
     let state: any = {};
     if (isUsingMongoDB) {
@@ -691,7 +690,7 @@ app.get('/api/export-zip/page/:name', async (req, res) => {
   }
 });
 
-app.get('/api/state', async (req, res) => {
+app.get('/api/state', async (_req, res) => {
   try {
     if (isUsingMongoDB) {
       const pages = await Page.find({}, 'name');
@@ -1464,7 +1463,7 @@ async function startServer() {
   } else {
     const distPath = path.join(process.cwd(), 'dist');
     app.use(express.static(distPath));
-    app.get('*', (req, res) => {
+    app.get('*', (_req, res) => {
       res.sendFile(path.join(distPath, 'index.html'));
     });
   }

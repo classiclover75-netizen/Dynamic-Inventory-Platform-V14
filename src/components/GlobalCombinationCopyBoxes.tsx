@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { AppState, GlobalCopyBoxesSettings } from '../types';
+import { GlobalCopyBoxesSettings } from '../types';
 import { Copy } from 'lucide-react';
 import { useToast } from './ToastProvider';
 

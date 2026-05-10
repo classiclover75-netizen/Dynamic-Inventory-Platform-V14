@@ -4,16 +4,12 @@ import {
   Settings,
   Plus,
   X,
-  Edit,
   Trash2,
-  Copy,
-  Image as ImageIcon,
   RefreshCw,
   GripVertical,
   ArrowUp,
   ArrowDown,
   Lock,
-  Unlock,
   Undo2,
   Redo2,
   History,
@@ -22,8 +18,6 @@ import { useVirtualizer } from "@tanstack/react-virtual";
 import {
   useReactTable,
   getCoreRowModel,
-  flexRender,
-  ColumnSizingState,
 } from "@tanstack/react-table";
 import {
   DragDropContext,
@@ -31,7 +25,7 @@ import {
   Draggable,
   DropResult,
 } from "@hello-pangea/dnd";
-import { Button, Input, Modal } from "./components/ui";
+import { Button, Input } from "./components/ui";
 import { ToastProvider, useToast } from "./components/ToastProvider";
 import { CopyPopupNotification } from "./components/CopyPopupNotification";
 import { CreatePageModal } from "./components/CreatePageModal";
@@ -57,7 +51,6 @@ import {
   Column,
   PageConfig,
   RowData,
-  GlobalCopyBoxesSettings,
 } from "./types";
 
 const initialConfig: PageConfig = {
@@ -123,16 +116,6 @@ const parseMultiSource = (val: any) => {
   }
 };
 
-const RANDOM_COLORS = [
-  "bg-blue-100 text-blue-800 border-blue-200",
-  "bg-green-100 text-green-800 border-green-200",
-  "bg-orange-100 text-orange-800 border-orange-200",
-  "bg-purple-100 text-purple-800 border-purple-200",
-  "bg-pink-100 text-pink-800 border-pink-200",
-  "bg-teal-100 text-teal-800 border-teal-200",
-];
-const getRandomColor = () =>
-  RANDOM_COLORS[Math.floor(Math.random() * RANDOM_COLORS.length)];
 
 const ColumnResizeHandle = ({
   header,
@@ -1019,7 +1002,6 @@ function AppContent() {
     confirmLabel?: string;
     onConfirm: () => void;
   } | null>(null);
-  const [rowToDelete, setRowToDelete] = useState<string | null>(null);
   const [previewContext, setPreviewContext] = useState<{
     rowId: string;
     imageKey: string;
@@ -1920,7 +1902,7 @@ function AppContent() {
       // Auto-sync trackers
       const linkedTrackers = Object.entries(state.pageConfigs)
         .filter(
-          ([name, c]) => (c as PageConfig).linkedSourcePage === targetPage,
+          ([_, c]) => (c as PageConfig).linkedSourcePage === targetPage,
         )
         .map(([name]) => name);
 
@@ -2069,9 +2051,6 @@ function AppContent() {
 
     // Safety Verification Check: Force string conversion to prevent strict equality mismatch
     const safeRowId = String(rowId);
-    const currentRows = state.pageRows[targetPage] || [];
-    const newRows = currentRows.filter((r) => String(r.id) !== safeRowId);
-
     try {
       await fetch(
         `/api/pageRows/${encodeURIComponent(targetPage)}/${encodeURIComponent(safeRowId)}`,
@@ -2094,7 +2073,7 @@ function AppContent() {
       // Auto-sync trackers (delete row)
       const linkedTrackers = Object.entries(state.pageConfigs)
         .filter(
-          ([name, c]) => (c as PageConfig).linkedSourcePage === targetPage,
+          ([_, c]) => (c as PageConfig).linkedSourcePage === targetPage,
         )
         .map(([name]) => name);
 

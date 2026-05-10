@@ -3,7 +3,7 @@ import { Modal, Button } from './ui';
 import { RowData, Column } from '../types';
 import { Trash2 } from 'lucide-react';
 
-interface DuplicateFinderModalProps {
+export interface DuplicateFinderModalProps {
   isOpen: boolean;
   onClose: () => void;
   onBack?: () => void;
@@ -88,7 +88,7 @@ export const DuplicateFinderModal = React.memo(({
                       </tr>
                     </thead>
                     <tbody>
-                      {group.map((row, rowIndex) => (
+                      {group.map((row) => (
                         <tr key={row.id} className="border-b border-gray-100 last:border-b-0 hover:bg-gray-50">
                           {columns
                             .filter((c) => !['id', '_id', 'sr', 'images'].includes(c.key) && c.type !== 'image')
