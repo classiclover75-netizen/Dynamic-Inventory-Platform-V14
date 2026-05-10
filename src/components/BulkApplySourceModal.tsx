@@ -24,7 +24,7 @@ interface BulkApplySourceModalProps {
     sourceColor: string;
     colKey: string;
   } | null;
-  onConfirm: (selectedRowIds: Set<string>) => void;
+  onConfirm: (selectedRowIds: Set<string>, sourcesToApply: { source: string; color: string }[]) => void;
   decodeHtmlEntities: (html: string) => string;
   parseMultiSource: (val: any) => any[];
   getImageUrl: (val: any) => string;
@@ -43,15 +43,37 @@ export const BulkApplySourceModal: React.FC<BulkApplySourceModalProps> = ({
 }) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedRowIds, setSelectedRowIds] = useState<Set<string>>(new Set());
+  const [selectedSourcesToApply, setSelectedSourcesToApply] = useState<{ source: string; color: string }[]>([]);
+
+  const allAvailableSources = useMemo(() => {
+    const sourcesMap = new Map<string, string>(); // name -> color
+    rows.forEach((r) => {
+      const parsed = parseMultiSource(r.total_qty);
+      parsed.forEach((s: any) => {
+        if (s.source) {
+          sourcesMap.set(s.source, s.color || "bg-gray-100 text-gray-800 border-gray-200");
+        }
+      });
+    });
+    return Array.from(sourcesMap.entries())
+      .map(([source, color]) => ({ source, color }))
+      .sort((a, b) => a.source.localeCompare(b.source));
+  }, [rows, parseMultiSource]);
 
   // Reset state when modal opens
   useEffect(() => {
     if (isOpen) {
       setSearchQuery("");
-      const initialSelected = new Set(rows.map(r => String(r.id)));
+      const initialSelected = new Set(rows.map((r) => String(r.id)));
       setSelectedRowIds(initialSelected);
+
+      if (context) {
+        setSelectedSourcesToApply([{ source: context.sourceName, color: context.sourceColor }]);
+      } else {
+        setSelectedSourcesToApply([]);
+      }
     }
-  }, [isOpen, rows]);
+  }, [isOpen, rows, context]);
 
   const deferredSearchQuery = useDeferredValue(searchQuery);
 
@@ -194,16 +216,53 @@ export const BulkApplySourceModal: React.FC<BulkApplySourceModalProps> = ({
       onClose={onClose}
       title={
         <span className="flex items-center gap-2">
-          ⚡ Apply Source:
-          <span className={`px-2 py-0.5 rounded text-[14px] font-bold ${context.sourceColor}`}>
-            {context.sourceName}
-          </span>
+          ⚡ Bulk Apply Sources
         </span>
       }
       width="95vw"
       noScroll={true}
     >
       <div className="flex flex-col h-[85vh] p-4">
+        {/* Step 0: Source Selector */}
+        <div className="mb-4 p-4 border rounded-lg bg-blue-50 border-blue-100">
+          <label className="text-[11px] font-bold text-blue-700 uppercase tracking-wider mb-2 block">
+            Step 1: Select Sources to Apply
+          </label>
+          <div className="flex flex-wrap gap-2">
+            {allAvailableSources.map((s) => {
+              const isSelected = selectedSourcesToApply.some((x) => x.source === s.source);
+              return (
+                <button
+                  key={s.source}
+                  onClick={() => {
+                    if (isSelected) {
+                      setSelectedSourcesToApply((prev) => prev.filter((x) => x.source !== s.source));
+                    } else {
+                      setSelectedSourcesToApply((prev) => [...prev, s]);
+                    }
+                  }}
+                  className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all border flex items-center gap-1.5 ${
+                    isSelected
+                      ? `shadow-md transform scale-105 ${s.color}`
+                      : "bg-white text-gray-500 border-gray-200 hover:border-blue-300"
+                  }`}
+                >
+                  <input
+                    type="checkbox"
+                    checked={isSelected}
+                    readOnly
+                    className="w-3 h-3 cursor-pointer"
+                  />
+                  {s.source}
+                </button>
+              );
+            })}
+          </div>
+          <p className="text-[10px] text-gray-400 mt-2 italic">
+            * Selected sources will be added to the chosen rows with quantity 0 if they don't already exist.
+          </p>
+        </div>
+
         <div className="p-4 border-b border-gray-200 bg-gray-50 flex gap-3 items-center w-full">
           <div className="relative flex-1 w-full">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
@@ -355,11 +414,11 @@ export const BulkApplySourceModal: React.FC<BulkApplySourceModalProps> = ({
             </Button>
             <Button
               variant="dark"
-              onClick={() => onConfirm(selectedRowIds)}
-              disabled={selectedRowIds.size === 0}
+              onClick={() => onConfirm(selectedRowIds, selectedSourcesToApply)}
+              disabled={selectedRowIds.size === 0 || selectedSourcesToApply.length === 0}
               className="flex items-center gap-2 !bg-[#2b579a] hover:!bg-[#1a3c6d] text-white"
             >
-              ⚡ Apply Source
+              ⚡ Apply {selectedSourcesToApply.length} Sources
             </Button>
           </div>
         </div>

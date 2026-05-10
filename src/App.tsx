@@ -2014,27 +2014,38 @@ function AppContent() {
     toggleModal("bulkApplySource", true);
   };
 
-  const handleConfirmBulkApply = async (selectedRowIds: Set<string>) => {
+  const handleConfirmBulkApply = async (
+    selectedRowIds: Set<string>,
+    sourcesToApply: { source: string; color: string }[],
+  ) => {
     if (!bulkApplyContext) return;
-    const { pageName, colKey, sourceName, sourceColor } = bulkApplyContext;
+    const { pageName, colKey } = bulkApplyContext;
 
     try {
       const rows = state.pageRows[pageName] || [];
       let hasChanges = false;
-      const updatedRows = rows.map(r => {
+      const updatedRows = rows.map((r) => {
         if (!selectedRowIds.has(String(r.id))) return r;
-        
+
+        let rowModified = false;
         const arr = parseMultiSource(r[colKey]);
-        if (!arr.find((x: any) => x.source === sourceName)) {
-          arr.push({ source: sourceName, qty: 0, color: sourceColor });
-          hasChanges = true;
+
+        sourcesToApply.forEach((sToApply) => {
+          if (!arr.find((x: any) => x.source === sToApply.source)) {
+            arr.push({ source: sToApply.source, qty: 0, color: sToApply.color });
+            rowModified = true;
+            hasChanges = true;
+          }
+        });
+
+        if (rowModified) {
           return { ...r, [colKey]: JSON.stringify(arr) };
         }
         return r;
       });
 
       if (!hasChanges) {
-        toast(`"${sourceName}" is already present in all selected rows.`);
+        toast(`Selected sources are already present in all selected rows.`);
         toggleModal("bulkApplySource", false);
         return;
       }
@@ -2054,7 +2065,9 @@ function AppContent() {
           [pageName]: updatedRows,
         },
       }));
-      toast(`Successfully applied source to ${selectedRowIds.size} rows`);
+      toast(
+        `Successfully applied ${sourcesToApply.length} source(s) to ${selectedRowIds.size} rows`,
+      );
       toggleModal("bulkApplySource", false);
     } catch (err: any) {
       console.error(err);
