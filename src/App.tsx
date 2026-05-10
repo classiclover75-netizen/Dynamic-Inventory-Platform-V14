@@ -1444,12 +1444,10 @@ function AppContent() {
   };
 
   const handleCreatePage = async (name: string, columns: Column[]) => {
-    const columnsWithDefaults = columns.map((c) => {
-      if (c.type === "sale_tracker" || (c as any).type === "range") {
-        return { ...c, width: c.width || 150 };
-      }
-      return c;
-    });
+    const columnsWithDefaults = columns.map((c) => ({
+      ...c,
+      width: c.width || 150,
+    }));
 
     const newConfig = {
       rowReorderEnabled: false,
@@ -1701,71 +1699,36 @@ function AppContent() {
     );
     const updatedConfig = { ...activeConfig, columns: updatedColumns };
 
-    // 2. Find all Live Trackers linked to this page
-    const linkedTrackers = Object.entries(state.pageConfigs)
-      .filter(
-        ([, cfg]) => (cfg as PageConfig).linkedSourcePage === state.activePage,
-      )
-      .map(([name]) => name);
-
-    // 3. Prepare state mapping and API promises
-    const newPageConfigs = {
-      ...state.pageConfigs,
-      [state.activePage]: updatedConfig,
-    };
-    const apiPromises = [
-      fetch(`/api/pageConfigs/${encodeURIComponent(state.activePage)}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ config: updatedConfig }),
-      }),
-    ];
-
-    // 4. Update the specific column in every linked tracker silently
-    linkedTrackers.forEach((trackerName) => {
-      const trackerConfig = state.pageConfigs[trackerName];
-      if (trackerConfig) {
-        const updatedTrackerCols = trackerConfig.columns.map((c) =>
-          c.key === colKey ? { ...c, width: roundedWidth } : c,
-        );
-        const newTrackerConfig = {
-          ...trackerConfig,
-          columns: updatedTrackerCols,
-        };
-        newPageConfigs[trackerName] = newTrackerConfig;
-
-        apiPromises.push(
-          fetch(`/api/pageConfigs/${encodeURIComponent(trackerName)}`, {
-            method: "PUT",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ config: newTrackerConfig }),
-          }),
-        );
-      }
-    });
-
-    // 5. Update frontend UI instantly for all pages
+    // 2. Update frontend UI instantly for the active page
     setState((prev) => ({
       ...prev,
-      pageConfigs: newPageConfigs,
+      pageConfigs: {
+        ...prev.pageConfigs,
+        [state.activePage]: updatedConfig,
+      },
     }));
 
-    // 6. Save all updates to the database concurrently
     try {
-      await Promise.all(apiPromises);
+      await fetch(`/api/pages/update-config`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          pageName: state.activePage,
+          config: updatedConfig,
+        }),
+      });
     } catch (err) {
-      console.error("Failed to sync column widths to trackers", err);
+      console.error("Failed to update column width on server:", err);
+      toast("Failed to save column width permanently");
     }
   };
 
   const handleCreateColumns = async (newColumns: Column[]) => {
-    // Set default width of 150 for sale and range columns
-    const columnsWithDefaults = newColumns.map((c) => {
-      if (c.type === "sale_tracker" || (c as any).type === "range") {
-        return { ...c, width: c.width || 150 };
-      }
-      return c;
-    });
+    // Set default width of 150 for all new columns
+    const columnsWithDefaults = newColumns.map((c) => ({
+      ...c,
+      width: c.width || 150,
+    }));
 
     const updatedConfig = {
       ...state.pageConfigs[state.activePage],

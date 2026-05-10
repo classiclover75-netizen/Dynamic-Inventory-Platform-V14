@@ -811,6 +811,23 @@ app.delete('/api/pages/:name', async (req, res) => {
   }
 });
 
+app.post('/api/pages/update-config', async (req, res) => {
+  try {
+    const { pageName, config } = req.body;
+    if (isUsingMongoDB) {
+      await Page.findOneAndUpdate({ name: pageName }, { config });
+    } else {
+      const db = await getLocalDB();
+      const page = db.pages.find((p: any) => p.name === pageName);
+      if (page) page.config = config;
+      await saveLocalDB(db);
+    }
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to update config' });
+  }
+});
+
 app.put('/api/pageConfigs/:name', async (req, res) => {
   try {
     const { name } = req.params;
