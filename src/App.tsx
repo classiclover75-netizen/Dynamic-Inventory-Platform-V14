@@ -3674,16 +3674,16 @@ function AppContent() {
                                                           <span className={`px-2 py-1 rounded text-[15px] font-bold border ${ts.color}`}>{ts.source}</span>
                                                           <input
                                                             type="number"
-                                                            value={saleQty === 0 ? "" : saleQty}
+                                                            value={saleQty === 0 ? "0" : saleQty || ""}
+                                                            placeholder="0"
                                                             onChange={(e) => {
                                                               const copy = [...draftVal];
                                                               const existingIdx = copy.findIndex((s: any) => s.source === ts.source);
-                                                              let newQty = parseFloat(e.target.value);
-                                                              if (isNaN(newQty)) newQty = 0;
+                                                              const newVal = e.target.value;
                                                               if (existingIdx >= 0) {
-                                                                copy[existingIdx].qty = newQty;
+                                                                copy[existingIdx].qty = newVal;
                                                               } else {
-                                                                copy.push({ source: ts.source, qty: newQty, color: ts.color });
+                                                                copy.push({ source: ts.source, qty: newVal, color: ts.color });
                                                               }
                                                               setInlineEdit((prev) => ({ ...prev!, val: JSON.stringify(copy) }));
                                                             }}
@@ -3701,7 +3701,7 @@ function AppContent() {
                                                               }
                                                             }}
                                                             autoFocus
-                                                            className="w-24 bg-gray-50 border border-gray-300 px-2 py-1 text-right font-bold text-[16px] rounded text-blue-800 outline-none focus:border-blue-600 focus:bg-white focus:ring-2 focus:ring-blue-100 transition-all [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                                                            className="w-24 bg-gray-50 border border-gray-300 px-2 py-1 text-right font-bold text-[16px] rounded text-blue-800 outline-none focus:border-blue-600 focus:bg-white focus:ring-2 focus:ring-blue-100 transition-all [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none placeholder:text-gray-400/70"
                                                           />
                                                         </div>
                                                         <div className="flex items-center justify-end gap-3 pt-1">
