@@ -3632,10 +3632,10 @@ function AppContent() {
                                         <td
                                           key={col.key}
                                           {...commonProps}
-                                          style={{ ...commonProps.style, overflow: isCellEditing ? "visible" : commonProps.style.overflow, zIndex: isCellEditing ? 99999 : "auto" }}
+                                          style={{ ...commonProps.style, overflow: isCellEditing ? "visible" : commonProps.style.overflow, zIndex: isCellEditing ? 99999 : undefined }}
                                           className={`p-1.5 border-r-[length:medium] border-b-[length:medium] border-[#e0e0e0] ${hoverClass} text-xs ${isCellEditing ? "relative !z-[60]" : ""}`}
                                         >
-                                          <div className="flex flex-col gap-1 justify-center w-full h-full min-h-[20px]">
+                                          <div className="flex flex-col gap-1 justify-center w-full min-h-[20px]">
                                             {totalSources.length > 0 ? (
                                               totalSources.map(
                                                 (ts: any, idx: number) => {
@@ -3741,9 +3741,9 @@ function AppContent() {
                                                 }
                                               )
                                             ) : (
-                                              <span className="inline-block bg-red-50 text-red-600 font-extrabold text-[14px] px-2 py-0.5 rounded border border-red-200 shadow-sm self-start">
+                                              <div className="bg-red-50 text-red-600 font-extrabold text-[14px] px-2 py-0.5 rounded border border-red-200 shadow-sm w-full block">
                                                 0
-                                              </span>
+                                              </div>
                                             )}
                                           </div>
                                         </td>
