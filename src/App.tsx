@@ -3566,7 +3566,7 @@ function AppContent() {
                                               (s: any, idx: number) => (
                                                 <div
                                                   key={idx}
-                                                  className={`px-2 py-0.5 rounded text-[14px] font-bold border flex items-center gap-1 ${s.remaining <= (config.minStockAlert ?? 0) ? "bg-red-100 text-red-800 border-red-200" : s.color}`}
+                                                  className={`px-2 py-0.5 rounded text-[14px] font-bold border flex items-center gap-1 ${s.remaining <= (config.minStockAlert ?? 0) ? "bg-[#FF0000] text-white border-[#cc0000] shadow-md" : s.color}`}
                                                 >
                                                   <span className="opacity-70">
                                                     {s.source}:
@@ -3576,7 +3576,7 @@ function AppContent() {
                                               ),
                                             )}
                                             {remainingSources.length === 0 && (
-                                              <span className="inline-block bg-red-50 text-red-600 font-extrabold text-[14px] px-2 py-0.5 rounded border border-red-200 shadow-sm">
+                                              <span className="inline-block bg-[#FF0000] text-white font-extrabold text-[14px] px-2 py-0.5 rounded border border-[#cc0000] shadow-sm">
                                                 0
                                               </span>
                                             )}
