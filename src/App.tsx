@@ -2285,6 +2285,13 @@ function AppContent() {
 
     const allSources = new Set<string>();
     activeRows.forEach((row) => {
+      // 1. Scan global sources from total_qty
+      const totalSources = parseMultiSource(row.total_qty);
+      totalSources.forEach((s: any) => {
+        if (s.source) allSources.add(s.source);
+      });
+
+      // 2. Scan specific range columns
       keys.forEach((k) => {
         const parsed = parseMultiSource(row[k]);
         parsed.forEach((s: any) => {
