@@ -179,7 +179,7 @@ const ColumnResizeHandle = ({
   if (!header) return null;
 
   const handleManualSave = () => {
-    const val = parseInt(inputValue);
+    const val = Number(inputValue);
     if (!isNaN(val) && onManualSave) {
       onManualSave(header.column.id, val);
     }
@@ -235,13 +235,14 @@ const ColumnResizeHandle = ({
               onClick={() => setShowManualInput(false)}
             />
             <div
-              className="fixed z-[10001] bg-white border border-gray-300 p-2 rounded shadow-2xl flex items-center gap-2"
+              className="fixed z-[10001] bg-white border border-gray-300 p-2 rounded shadow-2xl flex items-center gap-1.5"
               style={{
                 left: `${mousePos.x}px`,
                 top: `${mousePos.y}px`,
                 transform: "translate(-50%, -110%)",
               }}
               onMouseDown={(e) => e.stopPropagation()}
+              onDoubleClick={(e) => e.stopPropagation()}
             >
               <input
                 type="number"
@@ -256,9 +257,15 @@ const ColumnResizeHandle = ({
               />
               <button
                 onClick={handleManualSave}
-                className="bg-blue-500 text-white px-2 py-1 rounded text-xs font-bold hover:bg-blue-600"
+                className="bg-blue-600 text-white text-[10px] px-2 py-0.5 rounded font-bold hover:bg-blue-700"
               >
-                OK
+                Save
+              </button>
+              <button
+                onClick={() => setShowManualInput(false)}
+                className="bg-gray-400 text-white text-[10px] px-2 py-0.5 rounded font-bold hover:bg-gray-500"
+              >
+                Cancel
               </button>
             </div>
           </>,
