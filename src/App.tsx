@@ -23,6 +23,7 @@ import {
   useReactTable,
   getCoreRowModel,
   flexRender,
+  ColumnSizingState,
 } from "@tanstack/react-table";
 import {
   DragDropContext,
@@ -1895,8 +1896,8 @@ function AppContent() {
         setPrimarySearchTags([]);
 
         setTimeout(() => {
-          if (parentRef.current) {
-            parentRef.current.scrollTop = parentRef.current.scrollHeight;
+          if (primParentRef.current) {
+            primParentRef.current.scrollTop = primParentRef.current.scrollHeight;
           }
         }, 100);
       }
@@ -2671,63 +2672,119 @@ function AppContent() {
       activeConfig.secondarySearchPage &&
       state.pageConfigs[activeConfig.secondarySearchPage]
     );
+
   const displayConfig = isSecondaryActive
     ? state.pageConfigs[activeConfig.secondarySearchPage!]
     : { ...activeConfig, columns: activeColumnsWithSum };
   const displayRows = isSecondaryActive ? secondaryFilteredRows : filteredRows;
   const displayQueries = isSecondaryActive ? secondaryQueries : primaryQueries;
 
-  const visibleColumnsForTable = useMemo(() => {
-    if (!displayConfig || !displayConfig.columns) return [];
-    return displayConfig.columns
+  const primVisibleColumns = useMemo(() => {
+    const pConfig = state.pageConfigs[state.activePage];
+    if (!pConfig || !pConfig.columns) return [];
+    return pConfig.columns
       .filter((col) => showArchived || !col.archived)
-      .map((col) => {
-        const isSr = col.key === "sr";
-        let defaultWidth = 130;
-        if (col.width) defaultWidth = col.width;
-        else if (isSr) defaultWidth = state.globalRowNoWidth || 100;
-        else if (col.type === "image") defaultWidth = 137;
+      .map((col) => ({
+        id: col.key,
+        accessorKey: col.key,
+        header: () => col.name,
+        size:
+          col.width ||
+          (col.key === "sr" ? state.globalRowNoWidth || 100 : col.type === "image" ? 137 : 150),
+      }));
+  }, [state.activePage, state.pageConfigs, showArchived, state.globalRowNoWidth]);
 
-        return {
-          id: col.key,
-          accessorKey: col.key,
-          header: () => col.name,
-          size: defaultWidth,
-        };
-      });
-  }, [displayConfig, showArchived, state.globalRowNoWidth]);
+  const secVisibleColumns = useMemo(() => {
+    const secPage = activeConfig.secondarySearchPage;
+    if (!secPage || !state.pageConfigs[secPage]) return [];
+    const secConfig = state.pageConfigs[secPage];
+    return secConfig.columns
+      .filter((col) => showArchived || !col.archived)
+      .map((col) => ({
+        id: col.key,
+        accessorKey: col.key,
+        header: () => col.name,
+        size:
+          col.width ||
+          (col.key === "sr" ? state.globalRowNoWidth || 100 : col.type === "image" ? 137 : 150),
+      }));
+  }, [activeConfig.secondarySearchPage, state.pageConfigs, showArchived, state.globalRowNoWidth]);
 
-  const appTable = useReactTable({
-    data: displayRows || [],
-    columns: visibleColumnsForTable,
+  const [primSizing, setPrimSizing] = useState<ColumnSizingState>({});
+  const [secSizing, setSecSizing] = useState<ColumnSizingState>({});
+
+  const primTable = useReactTable({
+    data: filteredRows || [],
+    columns: primVisibleColumns,
     columnResizeMode: "onChange",
     getCoreRowModel: getCoreRowModel(),
+    state: { columnSizing: primSizing },
+    onColumnSizingChange: setPrimSizing,
   });
 
-  const sizingInfo = appTable.getState().columnSizingInfo;
-  const sizing = appTable.getState().columnSizing;
-  const prevResizingColRef = useRef<string | boolean>(false);
+  const secTable = useReactTable({
+    data: secondaryFilteredRows || [],
+    columns: secVisibleColumns,
+    columnResizeMode: "onChange",
+    getCoreRowModel: getCoreRowModel(),
+    state: { columnSizing: secSizing },
+    onColumnSizingChange: setSecSizing,
+  });
+
+  const primSizingInfo = primTable.getState().columnSizingInfo;
+  const secSizingInfo = secTable.getState().columnSizingInfo;
+  const prevPrimResizingColRef = useRef<string | boolean>(false);
+  const prevSecResizingColRef = useRef<string | boolean>(false);
 
   useEffect(() => {
-    const isResizing = sizingInfo.isResizingColumn;
-
+    const isResizing = primSizingInfo.isResizingColumn;
     if (isResizing) {
-      // User is currently dragging
-      prevResizingColRef.current = isResizing;
-    } else if (prevResizingColRef.current && !isResizing) {
-      // User just released the mouse (Resize Ended)
-      const colKey = prevResizingColRef.current as string;
-      const finalWidth = sizing[colKey];
-
+      prevPrimResizingColRef.current = isResizing;
+    } else if (prevPrimResizingColRef.current && !isResizing) {
+      const colKey = prevPrimResizingColRef.current as string;
+      const finalWidth = primSizing[colKey];
       if (colKey && finalWidth) {
-        const targetPage = isSecondaryActive ? activeConfig.secondarySearchPage : state.activePage;
-        handleSaveColumnWidth(colKey, finalWidth, targetPage as string);
+        handleSaveColumnWidth(colKey, finalWidth, state.activePage);
       }
-      prevResizingColRef.current = false;
+      prevPrimResizingColRef.current = false;
     }
-  }, [sizingInfo.isResizingColumn, sizing, isSecondaryActive, activeConfig, state.activePage]);
+  }, [primSizingInfo.isResizingColumn, primSizing, state.activePage]);
 
-  const parentRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const secPage = activeConfig.secondarySearchPage;
+    if (!secPage) return;
+    const isResizing = secSizingInfo.isResizingColumn;
+    if (isResizing) {
+      prevSecResizingColRef.current = isResizing;
+    } else if (prevSecResizingColRef.current && !isResizing) {
+      const colKey = prevSecResizingColRef.current as string;
+      const finalWidth = secSizing[colKey];
+      if (colKey && finalWidth) {
+        handleSaveColumnWidth(colKey, finalWidth, secPage);
+      }
+      prevSecResizingColRef.current = false;
+    }
+  }, [secSizingInfo.isResizingColumn, secSizing, activeConfig.secondarySearchPage]);
+
+  const primParentRef = useRef<HTMLDivElement>(null);
+  const secParentRef = useRef<HTMLDivElement>(null);
+
+  const primVirtualizer = useVirtualizer({
+    count: filteredRows.length,
+    getScrollElement: () => primParentRef.current,
+    estimateSize: () => state.pageConfigs[state.activePage]?.rowHeight || 100,
+    overscan: 5,
+  });
+
+  const secVirtualizer = useVirtualizer({
+    count: secondaryFilteredRows.length,
+    getScrollElement: () => secParentRef.current,
+    estimateSize: () => {
+      const secPage = activeConfig.secondarySearchPage;
+      return state.pageConfigs[secPage || ""]?.rowHeight || 100;
+    },
+    overscan: 5,
+  });
   const savedPrimScroll = useRef(0);
   const savedSecScroll = useRef(0);
   const wasPrimSearchActive = useRef(false);
@@ -2755,8 +2812,8 @@ function AppContent() {
         setGhostPrimQueries(prevPrimQueries.current);
         setGhostPrimIds(latestPrimFilteredIds.current);
         setTimeout(() => {
-          if (parentRef.current)
-            parentRef.current.scrollTop = savedPrimScroll.current;
+          if (primParentRef.current)
+            primParentRef.current.scrollTop = savedPrimScroll.current;
         }, 100);
       }
     }
@@ -2773,8 +2830,8 @@ function AppContent() {
         setGhostSecQueries(prevSecQueries.current);
         setGhostSecIds(latestSecFilteredIds.current);
         setTimeout(() => {
-          if (parentRef.current)
-            parentRef.current.scrollTop = savedSecScroll.current;
+          if (secParentRef.current)
+            secParentRef.current.scrollTop = savedSecScroll.current;
         }, 100);
       }
     }
@@ -2794,13 +2851,6 @@ function AppContent() {
       );
   }, [secondaryFilteredRows, secondaryQueries.length]);
 
-  const virtualizer = useVirtualizer({
-    count: displayRows.length,
-    getScrollElement: () => parentRef.current,
-    estimateSize: () => displayConfig?.rowHeight || 100,
-    overscan: 5,
-  });
-
   const renderTable = (
     config: PageConfig,
     rows: RowData[],
@@ -2810,9 +2860,14 @@ function AppContent() {
     isGhost: boolean,
     ghostIds: Set<string>,
   ) => {
+    const currentTable = isSecondary ? secTable : primTable;
+    const currentVirtualizer = isSecondary ? secVirtualizer : primVirtualizer;
+    const currentParentRef = isSecondary ? secParentRef : primParentRef;
+
     const activePage = isSecondary
-      ? activeConfig.secondarySearchPage
+      ? state.pageConfigs[state.activePage]?.secondarySearchPage
       : state.activePage;
+
     const isTableSorted = config.columns.some(
       (col) => col.sortEnabled && col.sortPriority && col.sortPriority > 0,
     );
@@ -2830,11 +2885,12 @@ function AppContent() {
       );
     }
 
-    const virtualItems = virtualizer.getVirtualItems();
+    const virtualItems = currentVirtualizer.getVirtualItems();
     const paddingTop = virtualItems.length > 0 ? virtualItems[0].start : 0;
     const paddingBottom =
       virtualItems.length > 0
-        ? virtualizer.getTotalSize() - virtualItems[virtualItems.length - 1].end
+        ? currentVirtualizer.getTotalSize() -
+          virtualItems[virtualItems.length - 1].end
         : 0;
     const colSpan =
       visibleColumns.length +
@@ -2865,7 +2921,7 @@ function AppContent() {
     return (
       <div
         className="flex-1 min-h-0 overflow-x-auto overflow-y-auto border-none rounded-none m-0 p-0 relative outline-none"
-        ref={parentRef}
+        ref={currentParentRef}
         tabIndex={0}
         onKeyDown={(e) => {
           if (
@@ -2875,18 +2931,20 @@ function AppContent() {
             return;
           if (e.key === "Home") {
             e.preventDefault();
-            virtualizer.scrollToIndex(0);
+            currentVirtualizer.scrollToIndex(0);
           } else if (e.key === "End") {
             e.preventDefault();
-            virtualizer.scrollToIndex(rows.length - 1);
+            currentVirtualizer.scrollToIndex(rows.length - 1);
           } else if (e.key === "PageUp") {
             e.preventDefault();
-            if (parentRef.current)
-              parentRef.current.scrollTop -= parentRef.current.clientHeight;
+            if (currentParentRef.current)
+              currentParentRef.current.scrollTop -=
+                currentParentRef.current.clientHeight;
           } else if (e.key === "PageDown") {
             e.preventDefault();
-            if (parentRef.current)
-              parentRef.current.scrollTop += parentRef.current.clientHeight;
+            if (currentParentRef.current)
+              currentParentRef.current.scrollTop +=
+                currentParentRef.current.clientHeight;
           }
         }}
         onScroll={(e) => {
@@ -2904,7 +2962,7 @@ function AppContent() {
           <table
             className="border-separate border-spacing-0 table-fixed w-max max-w-none text-[14px] font-normal"
             style={{
-              width: `${appTable.getTotalSize() + (!isSecondary && config.rowReorderEnabled ? 60 : 0) + 50}px`,
+              width: `${currentTable.getTotalSize() + (!isSecondary && config.rowReorderEnabled ? 60 : 0) + 50}px`,
             }}
             onMouseOver={handleTableMouseOver}
             onMouseOut={handleTableMouseOut}
@@ -2937,7 +2995,7 @@ function AppContent() {
                   </th>
                 )}
                 {visibleColumns.map((col, i) => {
-                  const header = appTable
+                  const header = currentTable
                     .getFlatHeaders()
                     .find((h) => h.id === col.key);
                   const isResizing = header?.column?.getIsResizing();
@@ -2948,7 +3006,7 @@ function AppContent() {
                         ? state.globalRowNoWidth || 100
                         : col.type === "image"
                           ? 137
-                          : 130);
+                          : 150);
 
                   const defaultWidthClass =
                     col.key === "sr"
@@ -3003,12 +3061,17 @@ function AppContent() {
 
                       <ColumnResizeHandle
                         header={header}
-                        onManualSave={(id, w) => handleSaveColumnWidth(id, w, isSecondary ? activeConfig.secondarySearchPage : state.activePage)}
+                        onManualSave={(id, w) =>
+                          handleSaveColumnWidth(id, w, activePage)
+                        }
                       />
                     </th>
                   );
                 })}
-                <th className="border-none bg-transparent pointer-events-none" style={{ width: "50px", minWidth: "50px", maxWidth: "50px" }}></th>
+                <th
+                  className="border-none bg-transparent pointer-events-none"
+                  style={{ width: "50px", minWidth: "50px", maxWidth: "50px" }}
+                ></th>
               </tr>
             </thead>
             <Droppable
@@ -3044,7 +3107,9 @@ function AppContent() {
                           isGhost && !ghostIds.has(String(row.id))
                         );
 
-                        const isRowEditing = inlineEdit?.id?.startsWith(String(row.id) + "-");
+                        const isRowEditing = inlineEdit?.id?.startsWith(
+                          String(row.id) + "-",
+                        );
 
                         const draggableProps: any = {
                           draggableId: `${isSecondary ? "sec-" : ""}${row.id}`,
@@ -3068,7 +3133,9 @@ function AppContent() {
                                     display: "table",
                                     tableLayout: "fixed",
                                   }),
-                                  ...(isRowEditing ? { position: "relative", zIndex: 60 } : {}),
+                                  ...(isRowEditing
+                                    ? { position: "relative", zIndex: 60 }
+                                    : {}),
                                   height: `${config.rowHeight || 100}px`,
                                 }}
                               >
@@ -3106,7 +3173,7 @@ function AppContent() {
                                   </td>
                                 )}
                                 {visibleColumns.map((col, colIndex) => {
-                                  const header = appTable
+                                  const header = currentTable
                                     .getFlatHeaders()
                                     .find((h) => h.id === col.key);
                                   const activeWidth = header
@@ -3116,7 +3183,7 @@ function AppContent() {
                                         ? state.globalRowNoWidth || 100
                                         : col.type === "image"
                                           ? 137
-                                          : 130);
+                                          : 150);
 
                                   const widthStyle = {
                                     width: `${activeWidth}px`,
@@ -3135,7 +3202,9 @@ function AppContent() {
                                     style: {
                                       ...widthStyle,
                                       position: "relative" as const,
-                                      overflow: isResizing ? "visible" : "hidden",
+                                      overflow: isResizing
+                                        ? ("visible" as const)
+                                        : ("hidden" as const),
                                     },
                                   };
 
