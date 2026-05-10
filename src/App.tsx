@@ -2768,30 +2768,40 @@ function AppContent() {
   const secSizing = secTable.getState().columnSizing;
 
   const prevPrimResizing = useRef<string | boolean | undefined>(false);
+  const prevPrimPage = useRef<string>(state.activePage);
   useEffect(() => {
     const wasResizing = prevPrimResizing.current;
     const isResizing = primSizingInfo?.isResizingColumn;
     prevPrimResizing.current = isResizing;
 
+    if (isResizing) {
+      prevPrimPage.current = state.activePage;
+    }
+
     if (wasResizing && !isResizing && typeof wasResizing === "string") {
       const finalWidth = primSizing[wasResizing];
       if (finalWidth) {
-        handleSaveColumnWidth(wasResizing, finalWidth as number, state.activePage);
+        handleSaveColumnWidth(wasResizing, finalWidth as number, prevPrimPage.current);
       }
     }
   }, [primSizingInfo?.isResizingColumn, primSizing, state.activePage, handleSaveColumnWidth]);
 
   const prevSecResizing = useRef<string | boolean | undefined>(false);
+  const prevSecPage = useRef<string | null>(activeConfig.secondarySearchPage || null);
   useEffect(() => {
     const wasResizing = prevSecResizing.current;
     const isResizing = secSizingInfo?.isResizingColumn;
     prevSecResizing.current = isResizing;
 
+    const secPage = activeConfig.secondarySearchPage;
+    if (isResizing) {
+      prevSecPage.current = secPage || null;
+    }
+
     if (wasResizing && !isResizing && typeof wasResizing === "string") {
       const finalWidth = secSizing[wasResizing];
-      const secPage = activeConfig.secondarySearchPage;
-      if (finalWidth && secPage) {
-        handleSaveColumnWidth(wasResizing, finalWidth as number, secPage);
+      if (finalWidth && prevSecPage.current) {
+        handleSaveColumnWidth(wasResizing, finalWidth as number, prevSecPage.current);
       }
     }
   }, [
