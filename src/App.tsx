@@ -3608,11 +3608,7 @@ function AppContent() {
                                                 </div>
                                               ),
                                             )}
-                                            {totalSources.length === 0 && (
-                                              <span className="inline-block bg-red-50 text-red-600 font-extrabold text-[14px] px-2 py-0.5 rounded border border-red-200 shadow-sm">
-                                                0
-                                              </span>
-                                            )}
+
                                           </div>
                                         </td>
                                       );
