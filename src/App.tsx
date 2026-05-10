@@ -1459,6 +1459,7 @@ function AppContent() {
           type: "system_serial",
           locked: true,
           movable: false,
+          width: state.globalRowNoWidth || 100,
         },
         ...columnsWithDefaults,
       ],
@@ -1688,23 +1689,26 @@ function AppContent() {
     }
   };
 
-  const handleSaveColumnWidth = async (colKey: string, newWidth: number) => {
-    if (!state.activePage || !activeConfig) return;
+  const handleSaveColumnWidth = async (colKey: string, newWidth: number, targetPageName?: string) => {
+    const targetPage = targetPageName || state.activePage;
+    if (!targetPage) return;
+    const targetConfig = state.pageConfigs[targetPage];
+    if (!targetConfig) return;
 
     const roundedWidth = Math.round(newWidth);
 
-    // 1. Update the active page's columns
-    const updatedColumns = activeConfig.columns.map((c) =>
+    // 1. Update the target page's columns
+    const updatedColumns = targetConfig.columns.map((c: Column) =>
       c.key === colKey ? { ...c, width: roundedWidth } : c,
     );
-    const updatedConfig = { ...activeConfig, columns: updatedColumns };
+    const updatedConfig = { ...targetConfig, columns: updatedColumns };
 
-    // 2. Update frontend UI instantly for the active page
+    // 2. Update frontend UI instantly for the target page
     setState((prev) => ({
       ...prev,
       pageConfigs: {
         ...prev.pageConfigs,
-        [state.activePage]: updatedConfig,
+        [targetPage]: updatedConfig,
       },
     }));
 
@@ -1713,7 +1717,7 @@ function AppContent() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          pageName: state.activePage,
+          pageName: targetPage,
           config: updatedConfig,
         }),
       });
@@ -2716,11 +2720,12 @@ function AppContent() {
       const finalWidth = sizing[colKey];
 
       if (colKey && finalWidth) {
-        handleSaveColumnWidth(colKey, finalWidth);
+        const targetPage = isSecondaryActive ? activeConfig.secondarySearchPage : state.activePage;
+        handleSaveColumnWidth(colKey, finalWidth, targetPage as string);
       }
       prevResizingColRef.current = false;
     }
-  }, [sizingInfo.isResizingColumn, sizing]);
+  }, [sizingInfo.isResizingColumn, sizing, isSecondaryActive, activeConfig, state.activePage]);
 
   const parentRef = useRef<HTMLDivElement>(null);
   const savedPrimScroll = useRef(0);
@@ -2998,7 +3003,7 @@ function AppContent() {
 
                       <ColumnResizeHandle
                         header={header}
-                        onManualSave={handleSaveColumnWidth}
+                        onManualSave={(id, w) => handleSaveColumnWidth(id, w, isSecondary ? activeConfig.secondarySearchPage : state.activePage)}
                       />
                     </th>
                   );
