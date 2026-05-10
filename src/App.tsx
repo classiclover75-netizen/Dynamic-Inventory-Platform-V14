@@ -3568,7 +3568,7 @@ function AppContent() {
                                                   key={idx}
                                                   className={`px-2 py-0.5 rounded text-[14px] font-bold border flex items-center gap-1 ${s.remaining <= (config.minStockAlert ?? 0) ? "bg-[#FF0000] text-white border-[#cc0000] shadow-md" : s.color}`}
                                                 >
-                                                  <span className="opacity-70">
+                                                  <span className={s.remaining <= (config.minStockAlert ?? 0) ? "text-white font-extrabold opacity-100" : "opacity-70"}>
                                                     {s.source}:
                                                   </span>{" "}
                                                   <span>{s.remaining}</span>
