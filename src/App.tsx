@@ -3152,7 +3152,7 @@ function AppContent() {
                   return (
                     <th
                       key={col.key}
-                      className={`relative sticky top-0 z-20 text-[14px] font-bold text-[#2f3d49] p-1.5 border-r-[length:medium] border-b-[length:medium] border-[#e0e0e0] ${defaultWidthClass} bg-[#f3f3f3] data-[hovered-col=true]:bg-[#fce7f3] ${isResizing ? "overflow-visible" : ""}`}
+                      className={`sticky top-0 z-20 text-[14px] font-bold text-[#2f3d49] p-1.5 border-r-[length:medium] border-b-[length:medium] border-[#e0e0e0] ${defaultWidthClass} bg-[#f3f3f3] data-[hovered-col=true]:bg-[#fce7f3] ${isResizing ? "overflow-visible" : ""}`}
                       style={{
                         width: `${activeWidth}px`,
                         minWidth: `${activeWidth}px`,
@@ -4643,7 +4643,7 @@ function AppContent() {
         )}
       </div>
 
-      <div className="flex-1 min-h-[260px] overflow-auto border border-gray-400 rounded-md bg-white flex flex-col">
+      <div className="flex-1 min-h-[260px] overflow-hidden border border-gray-400 rounded-md bg-white flex flex-col">
         {isLoading ? (
           <div className="flex-1 flex items-center justify-center text-[#2b579a] text-base font-bold text-center p-5 flex-col">
             <RefreshCw className="animate-spin mb-2" size={32} />
