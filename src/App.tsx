@@ -4404,12 +4404,7 @@ function AppContent() {
                           )
                             e.preventDefault();
                         }}
-                        className="border-0 focus:ring-0 text-sm w-full pr-14 h-8 min-w-0 overflow-x-auto whitespace-nowrap placeholder:text-gray-500"
-                        placeholder={
-                          primarySearchTags.length === 0
-                            ? `🔍 Search Data ${state.activePage ? `For "${state.activePage}"` : ""}`
-                            : ""
-                        }
+                        className="border-0 focus:ring-0 text-sm w-full pr-14 h-8 min-w-0 overflow-x-auto whitespace-nowrap"
                         value={primarySearchInput}
                         readOnly={isAnyModalOpen}
                         onChange={(e) => {
@@ -4425,6 +4420,14 @@ function AppContent() {
                         }}
                         onKeyDown={handlePrimKeyDown}
                       />
+                      {!primarySearchInput && primarySearchTags.length === 0 && (
+                        <div 
+                          className="absolute inset-y-0 left-1 right-12 flex items-center overflow-x-auto whitespace-nowrap text-gray-400 text-sm cursor-text [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
+                          onClick={() => primaryInputRef.current?.focus()}
+                        >
+                          🔍 Search Data {state.activePage ? <>For "<strong>{state.activePage}</strong>"</> : ""}
+                        </div>
+                      )}
                     </div>
                     <button
                       onClick={handleAddPrimaryTag}
@@ -4536,12 +4539,7 @@ function AppContent() {
                           )
                             e.preventDefault();
                         }}
-                        className="border-0 focus:ring-0 text-sm w-full pr-14 h-8 min-w-0 overflow-x-auto whitespace-nowrap placeholder:text-gray-500"
-                        placeholder={
-                          secondarySearchTags.length === 0
-                            ? `🔍 Search Data For "${activeConfig.secondarySearchPage}" (Secondary Search)`
-                            : ""
-                        }
+                        className="border-0 focus:ring-0 text-sm w-full pr-14 h-8 min-w-0 overflow-x-auto whitespace-nowrap"
                         value={secondarySearchInput}
                         readOnly={isAnyModalOpen}
                         onChange={(e) => {
@@ -4557,6 +4555,14 @@ function AppContent() {
                         }}
                         onKeyDown={handleSecKeyDown}
                       />
+                      {!secondarySearchInput && secondarySearchTags.length === 0 && (
+                        <div 
+                          className="absolute inset-y-0 left-1 right-12 flex items-center overflow-x-auto whitespace-nowrap text-gray-400 text-sm cursor-text [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
+                          onClick={() => secondaryInputRef.current?.focus()}
+                        >
+                          🔍 Search Data For "<strong>{activeConfig.secondarySearchPage}</strong>" (Secondary Search)
+                        </div>
+                      )}
                     </div>
                     <button
                       onClick={handleAddSecondaryTag}
