@@ -4404,7 +4404,7 @@ function AppContent() {
                           )
                             e.preventDefault();
                         }}
-                        className="border-0 focus:ring-0 text-sm w-full pr-8 h-8 min-w-0 truncate"
+                        className="border-0 focus:ring-0 text-sm w-full pr-14 h-8 min-w-0 overflow-x-auto whitespace-nowrap"
                         value={primarySearchInput}
                         readOnly={isAnyModalOpen}
                         onChange={(e) => {
@@ -4422,8 +4422,8 @@ function AppContent() {
                       />
                       {!primarySearchInput &&
                         primarySearchTags.length === 0 && (
-                          <div className="absolute inset-y-0 left-0 flex items-center pl-0 pointer-events-none text-gray-400 text-sm whitespace-nowrap overflow-hidden">
-                            <span className="truncate">
+                          <div className="absolute inset-y-0 left-0 flex items-center pl-0 pointer-events-none text-gray-400 text-sm whitespace-nowrap pr-14">
+                            <span className="">
                               🔍 Search Data{" "}
                               {state.activePage ? (
                                 <>
@@ -4546,7 +4546,7 @@ function AppContent() {
                           )
                             e.preventDefault();
                         }}
-                        className="border-0 focus:ring-0 text-sm w-full pr-8 h-8 min-w-0 truncate"
+                        className="border-0 focus:ring-0 text-sm w-full pr-14 h-8 min-w-0 overflow-x-auto whitespace-nowrap"
                         value={secondarySearchInput}
                         readOnly={isAnyModalOpen}
                         onChange={(e) => {
@@ -4564,8 +4564,8 @@ function AppContent() {
                       />
                       {!secondarySearchInput &&
                         secondarySearchTags.length === 0 && (
-                          <div className="absolute inset-y-0 left-0 flex items-center pl-0 pointer-events-none text-gray-400 text-sm whitespace-nowrap overflow-hidden">
-                            <span className="truncate">
+                          <div className="absolute inset-y-0 left-0 flex items-center pl-0 pointer-events-none text-gray-400 text-sm whitespace-nowrap pr-14">
+                            <span className="">
                               🔍 Search Data For "
                               <strong>{activeConfig.secondarySearchPage}</strong>"
                               (Secondary Search)
