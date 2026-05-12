@@ -4005,7 +4005,7 @@ function AppContent() {
   ]);
 
   const tableContent = (
-    <div className="w-full h-full flex flex-col text-[#333] text-left m-0 p-0">
+    <div className="w-full flex-1 min-h-0 flex flex-col text-[#333] text-left m-0 p-0">
       {isSecondaryActive && (
         <div className="bg-[#e8edf2] px-3 py-1.5 text-sm font-bold text-[#2b579a] border-y border-[#d8d8d8]">
           Viewing Secondary Data: {activeConfig.secondarySearchPage}
@@ -4137,7 +4137,7 @@ function AppContent() {
     isImporting;
 
   return (
-    <div className="flex flex-col min-h-screen w-full gap-2 p-2 md:p-6 bg-[#f4f7f6] text-[#333] font-sans box-border">
+    <div className="flex flex-col h-[100dvh] overflow-hidden w-full gap-2 p-2 md:p-6 bg-[#f4f7f6] text-[#333] font-sans box-border">
       <div className="flex justify-between items-center bg-white border border-[#d8d8d8] rounded-md p-2 px-2.5">
         <div className="text-[19px] font-bold text-[#2c3e50]">
           📦 Dynamic Inventory Platform{" "}
@@ -4643,7 +4643,7 @@ function AppContent() {
         )}
       </div>
 
-      <div className="flex-1 min-h-[260px] overflow-hidden border border-gray-400 rounded-md bg-white flex flex-col">
+      <div className="flex-1 min-h-0 overflow-hidden border border-gray-400 rounded-md bg-white flex flex-col">
         {isLoading ? (
           <div className="flex-1 flex items-center justify-center text-[#2b579a] text-base font-bold text-center p-5 flex-col">
             <RefreshCw className="animate-spin mb-2" size={32} />
