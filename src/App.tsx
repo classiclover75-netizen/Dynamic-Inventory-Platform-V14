@@ -4422,7 +4422,7 @@ function AppContent() {
                       />
                       {!primarySearchInput && primarySearchTags.length === 0 && (
                         <div 
-                          className="absolute inset-y-0 left-1 right-12 flex items-center overflow-x-auto whitespace-nowrap text-gray-400 text-sm cursor-text [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
+                          className="absolute inset-y-0 left-1 right-12 flex items-center overflow-x-auto whitespace-nowrap text-gray-400 text-sm cursor-text select-none [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
                           onClick={() => primaryInputRef.current?.focus()}
                         >
                           🔍 Search Data {state.activePage ? <>For "<strong>{state.activePage}</strong>"</> : ""}
@@ -4557,7 +4557,7 @@ function AppContent() {
                       />
                       {!secondarySearchInput && secondarySearchTags.length === 0 && (
                         <div 
-                          className="absolute inset-y-0 left-1 right-12 flex items-center overflow-x-auto whitespace-nowrap text-gray-400 text-sm cursor-text [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
+                          className="absolute inset-y-0 left-1 right-12 flex items-center overflow-x-auto whitespace-nowrap text-gray-400 text-sm cursor-text select-none [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
                           onClick={() => secondaryInputRef.current?.focus()}
                         >
                           🔍 Search Data For "<strong>{activeConfig.secondarySearchPage}</strong>" (Secondary Search)
