@@ -2985,6 +2985,53 @@ function AppContent() {
       );
   }, [secondaryFilteredRows, secondaryQueries.length]);
 
+  useEffect(() => {
+    const handleGlobalTableNav = (e: KeyboardEvent) => {
+      const target = e.target as HTMLElement;
+      if (
+        target.tagName === "INPUT" ||
+        target.tagName === "TEXTAREA" ||
+        target.isContentEditable
+      )
+        return;
+
+      const activeVirtualizer = isSecondaryActive
+        ? secVirtualizer
+        : primVirtualizer;
+      const activeParentRef = isSecondaryActive ? secParentRef : primParentRef;
+      const activeRowsCount = isSecondaryActive
+        ? secondaryFilteredRows.length
+        : filteredRows.length;
+
+      if (e.key === "Home") {
+        e.preventDefault();
+        activeVirtualizer.scrollToIndex(0);
+      } else if (e.key === "End") {
+        e.preventDefault();
+        activeVirtualizer.scrollToIndex(activeRowsCount - 1);
+      } else if (e.key === "PageUp") {
+        e.preventDefault();
+        if (activeParentRef.current)
+          activeParentRef.current.scrollTop -=
+            activeParentRef.current.clientHeight;
+      } else if (e.key === "PageDown") {
+        e.preventDefault();
+        if (activeParentRef.current)
+          activeParentRef.current.scrollTop +=
+            activeParentRef.current.clientHeight;
+      }
+    };
+
+    window.addEventListener("keydown", handleGlobalTableNav);
+    return () => window.removeEventListener("keydown", handleGlobalTableNav);
+  }, [
+    isSecondaryActive,
+    primVirtualizer,
+    secVirtualizer,
+    filteredRows.length,
+    secondaryFilteredRows.length,
+  ]);
+
   const renderTable = (
     config: PageConfig,
     rows: RowData[],
