@@ -199,10 +199,12 @@ const ColumnResizeHandle = ({
         }}
         onDoubleClick={(e) => {
           e.stopPropagation();
+          if (!e.ctrlKey && !e.metaKey) return;
           setInputValue(Math.round(header.getSize()).toString());
           setMousePos({ x: e.clientX, y: e.clientY });
           setShowManualInput(true);
         }}
+        title="Drag to resize, Ctrl+Double-Click for exact width"
         className={`absolute right-0 top-0 z-40 cursor-col-resize hover:bg-[#ADFF2F] touch-none select-none transition-colors w-[4px] h-full ${
           isResizing ? "bg-[#ADFF2F]" : ""
         }`}
