@@ -3139,9 +3139,64 @@ function AppContent() {
           }
         }}
       >
+        <div
+          className="absolute z-0 pointer-events-none top-0 bottom-0 left-0"
+          style={{
+            width: `${currentTable.getTotalSize() + (!isSecondary && config.rowReorderEnabled ? 60 : 0) + 50}px`,
+          }}
+        >
+          <table className="border-separate border-spacing-0 table-fixed w-full h-full text-[14px] font-normal min-h-full">
+            <thead>
+              <tr>
+                <th className="p-1.5 border-b-[length:medium] border-[#e0e0e0]">&nbsp;</th>
+              </tr>
+            </thead>
+            <tbody style={{ height: "100%" }}>
+              <tr style={{ height: "100%" }}>
+                {!isSecondary && config.rowReorderEnabled && (
+                  <td
+                    className="border-r-[length:medium] border-[#e0e0e0]"
+                    style={{
+                      width: "60px",
+                      minWidth: "60px",
+                      maxWidth: "60px",
+                      background: `repeating-linear-gradient(to bottom, transparent, transparent ${(config.rowHeight || 100) - 3}px, #e0e0e0 ${(config.rowHeight || 100) - 3}px, #e0e0e0 ${config.rowHeight || 100}px)`,
+                      backgroundPosition: "top left",
+                    }}
+                  />
+                )}
+                {visibleColumns.map((col) => {
+                  const header = currentTable.getFlatHeaders().find((h) => h.id === col.key);
+                  const activeWidth = header
+                    ? header.getSize()
+                    : col.width ||
+                      (col.key === "sr"
+                        ? state.globalRowNoWidth || 100
+                        : col.type === "image"
+                          ? 137
+                          : 150);
+                  return (
+                    <td
+                      key={col.key}
+                      className="border-r-[length:medium] border-[#e0e0e0]"
+                      style={{
+                        width: `${activeWidth}px`,
+                        minWidth: `${activeWidth}px`,
+                        maxWidth: `${activeWidth}px`,
+                        background: `repeating-linear-gradient(to bottom, transparent, transparent ${(config.rowHeight || 100) - 3}px, #e0e0e0 ${(config.rowHeight || 100) - 3}px, #e0e0e0 ${config.rowHeight || 100}px)`,
+                        backgroundPosition: "top left",
+                      }}
+                    />
+                  );
+                })}
+                <td className="border-none" style={{ minWidth: "50px" }}></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
         <DragDropContext onDragEnd={isSecondary ? () => {} : handleDragEnd}>
           <table
-            className="border-separate border-spacing-0 table-fixed w-max max-w-none text-[14px] font-normal"
+            className="border-separate border-spacing-0 table-fixed w-max max-w-none text-[14px] font-normal relative z-10 bg-white"
             style={{
               width: `${currentTable.getTotalSize() + (!isSecondary && config.rowReorderEnabled ? 60 : 0) + 50}px`,
             }}
@@ -3263,7 +3318,7 @@ function AppContent() {
               droppableId={`droppable-tbody-${isSecondary ? "secondary" : "primary"}`}
             >
               {(provided) => (
-                <tbody ref={provided.innerRef} {...provided.droppableProps}>
+                <tbody ref={provided.innerRef} className="relative z-10 bg-white" {...provided.droppableProps}>
                   {rows.length === 0 ? (
                     <tr>
                       <td
@@ -4690,7 +4745,7 @@ function AppContent() {
         )}
       </div>
 
-      <div className="flex-1 min-h-0 overflow-hidden border border-gray-400 rounded-md bg-white flex flex-col">
+      <div className="flex-1 min-h-0 overflow-hidden border-x border-t border-b-0 border-gray-400 rounded-t-md rounded-b-none bg-white flex flex-col">
         {isLoading ? (
           <div className="flex-1 flex items-center justify-center text-[#2b579a] text-base font-bold text-center p-5 flex-col">
             <RefreshCw className="animate-spin mb-2" size={32} />

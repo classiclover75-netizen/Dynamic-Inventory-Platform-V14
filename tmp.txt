@@ -1,0 +1,124 @@
+3267-                  {rows.length === 0 ? (
+3268-                    <tr>
+3269:                      <td
+3270-                        colSpan={colSpan}
+3271-                        className="text-center text-[#90a4ae] font-normal p-1.5 border-r-[length:medium] border-b-[length:medium] border-[#e0e0e0]"
+3272-                      >
+3273-                        {queries.length > 0
+3274-                          ? "No rows match your search."
+--
+3280-                      {paddingTop > 0 && (
+3281-                        <tr>
+3282:                          <td
+3283-                            colSpan={colSpan}
+3284-                            style={{ height: `${paddingTop}px` }}
+3285-                          />
+3286-                        </tr>
+3287-                      )}
+--
+3326-                              >
+3327-                                {!isSecondary && config.rowReorderEnabled && (
+3328:                                  <td
+3329-                                    className={`text-center p-1.5 border-r-[length:medium] border-b-[length:medium] border-[#e0e0e0] data-[hovered-col=true]:bg-[#f0f7ff] data-[hovered-row=true]:bg-[#e8f0fe] data-[hovered-exact=true]:!bg-[#d2e3fc] data-[hovered-exact=true]:outline data-[hovered-exact=true]:outline-[3px] data-[hovered-exact=true]:outline-[#2b579a] data-[hovered-exact=true]:relative data-[hovered-exact=true]:z-10 data-[hovered-exact=true]:shadow-inner`}
+3330-                                    style={{
+3331-                                      width: "60px",
+3332-                                      minWidth: "60px",
+3333-                                      maxWidth: "60px",
+--
+3396-                                  if (col.key === "sr") {
+3397-                                    return (
+3398:                                      <td
+3399-                                        key={col.key}
+3400-                                        {...commonProps}
+3401-                                        className={`font-normal p-1 border-r-[length:medium] border-b-[length:medium] border-[#e0e0e0] bg-[#f3f3f3] data-[hovered-row=true]:bg-[#fce7f3] overflow-hidden`}
+3402-                                      >
+3403-                                        <div className="flex items-center justify-center gap-0 px-0.5 whitespace-nowrap">
+--
+3446-                                        imgData.includes("."));
+3447-                                    return (
+3448:                                      <td
+3449-                                        key={col.key}
+3450-                                        {...commonProps}
+3451-                                        className={`text-center p-0 border-r-[length:medium] border-b-[length:medium] border-[#e0e0e0] ${hoverClass} bg-white overflow-hidden`}
+3452-                                        style={{
+3453-                                          ...commonProps.style,
+--
+3513-
+3514-                                    return (
+3515:                                      <td
+3516-                                        key={col.key}
+3517-                                        {...commonProps}
+3518-                                        className={`p-1.5 border-r-[length:medium] border-b-[length:medium] border-[#e0e0e0] ${cellClass} overflow-hidden`}
+3519-                                      >
+3520-                                        {items.length > 0 && (
+--
+3672-                                      const breakdown = parseMultiSource(row.custom_temp_sum_breakdown);
+3673-                                      return (
+3674:                                        <td
+3675-                                          key={col.key}
+3676-                                          {...commonProps}
+3677-                                          className={`p-1.5 border-r-[length:medium] border-b-[length:medium] border-[#e0e0e0] overflow-hidden whitespace-pre-wrap bg-purple-50 text-purple-900 font-bold text-center`}
+3678-                                        >
+3679-                                          <div className="flex flex-col gap-1 justify-center w-full min-h-[20px]">
+--
+3726-
+3727-                                      return (
+3728:                                        <td
+3729-                                          key={col.key}
+3730-                                          {...commonProps}
+3731-                                          className={`p-1.5 border-r-[length:medium] border-b-[length:medium] border-[#e0e0e0] ${hoverClass}`}
+3732-                                        >
+3733-                                          <div className="flex flex-col gap-1 justify-center">
+--
+3754-                                        parseMultiSource(rawVal);
+3755-                                      return (
+3756:                                        <td
+3757-                                          key={col.key}
+3758-                                          {...commonProps}
+3759-                                          className={`p-1.5 border-r-[length:medium] border-b-[length:medium] border-[#e0e0e0] ${hoverClass}`}
+3760-                                        >
+3761-                                          <div className="flex flex-col gap-1 justify-center">
+--
+3790-
+3791-                                      return (
+3792:                                        <td
+3793-                                          key={col.key}
+3794-                                          {...commonProps}
+3795-                                          style={{ ...commonProps.style, overflow: isCellEditing ? "visible" : commonProps.style.overflow, zIndex: isCellEditing ? 99999 : undefined }}
+3796-                                          className={`p-1.5 border-r-[length:medium] border-b-[length:medium] border-[#e0e0e0] ${hoverClass} text-xs ${isCellEditing ? "relative !z-[60]" : ""}`}
+3797-                                        >
+--
+3908-                                  if (Array.isArray(rawVal)) {
+3909-                                    return (
+3910:                                      <td
+3911-                                        key={col.key}
+3912-                                        {...commonProps}
+3913-                                        className={`p-1.5 border-r-[length:medium] border-b-[length:medium] border-[#e0e0e0] ${hoverClass} overflow-hidden`}
+3914-                                      >
+3915-                                        {rawVal.map((v, i) => {
+--
+3953-
+3954-                                  return (
+3955:                                    <td
+3956-                                      key={col.key}
+3957-                                      {...commonProps}
+3958-                                      className={`p-1.5 border-r-[length:medium] border-b-[length:medium] border-[#e0e0e0] ${hoverClass} overflow-hidden whitespace-pre-wrap`}
+3959-                                    >
+3960-                                      {hasHtmlRaw ? (
+--
+3978-                                  );
+3979-                                })}
+3980:                                <td className="border-none bg-transparent pointer-events-none" style={{ width: "50px", minWidth: "50px", maxWidth: "50px" }}></td>
+3981-                              </tr>
+3982-                            )}
+3983-                          </Draggable>
+3984-                        );
+3985-                      })}
+3986-                      {paddingBottom > 0 && (
+3987-                        <tr>
+3988:                          <td
+3989-                            colSpan={colSpan}
+3990-                            style={{ height: `${paddingBottom}px` }}
+3991-                          />
+3992-                        </tr>
+3993-                      )}
