@@ -163,9 +163,19 @@ const ColumnResizeHandle = ({
   if (!header) return null;
 
   const handleManualSave = () => {
-    const val = Number(inputValue);
-    if (!isNaN(val) && onManualSave) {
-      onManualSave(header.column.id, val);
+    let val = parseInt(inputValue);
+    if (!isNaN(val)) {
+      if (val < 20) val = 20;
+      if (onManualSave) {
+        onManualSave(header.column.id, val);
+      }
+      // Immediate UI update by poking table sizing state if possible
+      if (header?.getContext?.()?.table?.setColumnSizing) {
+        header.getContext().table.setColumnSizing((old: any) => ({
+          ...old,
+          [header.column.id]: val,
+        }));
+      }
     }
     setShowManualInput(false);
   };
@@ -233,10 +243,16 @@ const ColumnResizeHandle = ({
               </div>
               <div className="flex items-center gap-2">
                 <input
-                  type="number"
+                  type="text"
+                  inputMode="numeric"
+                  pattern="[0-9]*"
                   className="w-20 px-2 py-1 border rounded text-sm focus:outline-blue-500"
                   value={inputValue}
-                  onChange={(e) => setInputValue(e.target.value)}
+                  onBlur={handleManualSave}
+                  onChange={(e) => {
+                    const val = e.target.value.replace(/[^0-9]/g, "");
+                    setInputValue(val);
+                  }}
                   onKeyDown={(e) => {
                     if (e.key === "Enter") handleManualSave();
                     if (e.key === "Escape") setShowManualInput(false);
